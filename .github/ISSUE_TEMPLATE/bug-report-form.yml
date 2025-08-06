@@ -1,0 +1,100 @@
+name: Bug Report Form
+description: Please file a bug report.
+title: "[Bug]: "
+labels: ["bug"]
+projects: []
+assignees: []
+body:
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Choose in which environment the issue happened
+      multiple: true
+      options:
+        - DEV
+        - STAGE
+        - PRODUCTION
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Please enter an explicit description of your issue
+      placeholder: Short and explicit description of the issue...
+    validations:
+      required: true
+  - type: textarea
+    id: reprod
+    attributes:
+      label: "Reproduction steps"
+      description: Please enter an explicit description of the steps to reproduce the bug. Modify as you like
+      value: |
+        1. Go to: '...'
+        2. Click on: '....'
+        3. Scroll down to: '....'
+        4. See error:
+      render: bash
+    validations:
+      required: true
+  - type: textarea
+    id: what-is-expected
+    attributes:
+      label: What is expected?
+      description: Please enter an explicit description of your expectation
+      placeholder: Short and explicit description of the expectation
+    validations:
+      required: true
+  - type: textarea
+    id: issue-link
+    attributes:
+      label: Link to the issue
+      description: Please provide the link of the issue if applicable
+      placeholder: URL of the issue (if applicable)
+      render: bash
+    validations:
+      required: false
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Relevant screenshots
+      description: If applicable, add screenshots to help explain your problem. Copy and Paste the link to the images
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+  - type: dropdown
+    id: os
+    attributes:
+      label: "OS"
+      description: What is the impacted environment?
+      multiple: true
+      options:
+        - Windows
+        - Linux
+        - Mac
+    validations:
+      required: false
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: What browsers do you see the problem on?
+      multiple: true
+      options:
+        - Chrome
+        - Microsoft Edge
+        - Firefox
+        - Safari
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com). 
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
