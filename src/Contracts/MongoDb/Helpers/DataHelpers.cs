@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Helpers
+namespace Selise.Ecap.SC.Wopi.Contracts.MongoDb.Helpers
 {
     public class DataHelpers
     {

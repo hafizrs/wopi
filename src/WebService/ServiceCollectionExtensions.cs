@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace Selise.Ecap.SC.PraxisMonitor.WebService
+namespace Selise.Ecap.SC.Wopi.WebService
 {
     public static class ServiceCollectionExtensions
     {

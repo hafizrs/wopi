@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.Constants;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices;
+using Selise.Ecap.SC.Wopi.Contracts.Constants;
+using Selise.Ecap.SC.Wopi.Contracts.DomainServices;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Domain.DomainServices.Services
+namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.Services
 {
     public class AuthUtilityService : IAuthUtilityService
     {

@@ -8,9 +8,9 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices;
+using Selise.Ecap.SC.Wopi.Contracts.DomainServices;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Domain.DomainServices.Services
+namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.Services
 {
     public class ChangeLogService : IChangeLogService
     {

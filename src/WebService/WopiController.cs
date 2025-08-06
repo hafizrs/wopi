@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.Models;
-using Selise.Ecap.SC.WopiMonitor.Contracts.Commands.WopiModule;
-using Selise.Ecap.SC.WopiMonitor.Contracts.EntityResponse;
-using Selise.Ecap.SC.WopiMonitor.Contracts.Queries.WopiModule;
+using Selise.Ecap.SC.Wopi.Contracts.Models;
+using Selise.Ecap.SC.Wopi.Contracts.Commands.WopiModule;
+using Selise.Ecap.SC.Wopi.Contracts.EntityResponse;
+using Selise.Ecap.SC.Wopi.Contracts.Queries.WopiModule;
 using SeliseBlocks.Genesis.Framework;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
 using System.Threading.Tasks;
 
-namespace Selise.Ecap.SC.WopiMonitor.WebService
+namespace Selise.Ecap.SC.Wopi.WebService
 {
     public class WopiController : ControllerBase
     {

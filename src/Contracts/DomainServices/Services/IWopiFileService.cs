@@ -1,11 +1,11 @@
 ﻿using Selise.Ecap.Entities.PrimaryEntities.StorageService;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.Models;
+using Selise.Ecap.SC.Wopi.Contracts.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices
+namespace Selise.Ecap.SC.Wopi.Contracts.DomainServices
 {
-    public interface IPraxisFileService
+    public interface IWopiFileService
     {
         File GetFileInformation(string fileId);
         Task<File> GetFileInfoFromStorage(string fileId);

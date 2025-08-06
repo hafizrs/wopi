@@ -10,16 +10,16 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Selise.Ecap.Entities.PrimaryEntities.StorageService;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.Constants;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.EntityResponse;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.Models;
-using Selise.Ecap.SC.PraxisMonitor.Utils;
+using Selise.Ecap.SC.Wopi.Contracts.Constants;
+using Selise.Ecap.SC.Wopi.Contracts.DomainServices;
+using Selise.Ecap.SC.Wopi.Contracts.EntityResponse;
+using Selise.Ecap.SC.Wopi.Contracts.Models;
+using Selise.Ecap.SC.Wopi.Utils;
 using File = Selise.Ecap.Entities.PrimaryEntities.StorageService.File;
 using Azure.Core;
 using System.Threading;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Domain.DomainServices.Services
+namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.Services
 {
     public class StorageDataService : IStorageDataService
     {

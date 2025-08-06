@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Utils
+namespace Selise.Ecap.SC.Wopi.Utils
 {
     public class UrlFactoryProvider
     {

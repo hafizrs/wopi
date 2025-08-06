@@ -8,11 +8,11 @@ using MongoDB.Driver;
 using SeliseBlocks.Genesis.Framework.PDS.Entity;
 
 using SeliseBlocks.Genesis.Framework.Infrastructure;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.EntityResponse;
+using Selise.Ecap.SC.Wopi.Contracts.DomainServices;
+using Selise.Ecap.SC.Wopi.Contracts.EntityResponse;
 using SeliseBlocks.GraphQL.Infrastructure;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Domain.DomainServices.Services
+namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.Services
 {
     public class CommonUtilService : ICommonUtilService
     {

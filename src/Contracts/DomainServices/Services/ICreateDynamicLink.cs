@@ -1,6 +1,6 @@
-﻿using Selise.Ecap.SC.PraxisMonitor.Contracts.Models;
+﻿using Selise.Ecap.SC.Wopi.Contracts.Models;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices
+namespace Selise.Ecap.SC.Wopi.Contracts.DomainServices
 {
     public interface ICreateDynamicLink
     {

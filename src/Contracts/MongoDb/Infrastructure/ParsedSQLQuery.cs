@@ -1,8 +1,8 @@
-﻿using Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Dtos;
+﻿using Selise.Ecap.SC.Wopi.Contracts.MongoDb.Dtos;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Infrastructure
+namespace Selise.Ecap.SC.Wopi.Contracts.MongoDb.Infrastructure
 {
     public class ParsedSQLQuery
     {

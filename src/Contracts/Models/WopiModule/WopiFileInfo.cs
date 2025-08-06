@@ -1,6 +1,6 @@
 using System;
 
-namespace Selise.Ecap.SC.WopiMonitor.Contracts.Models.WopiModule
+namespace Selise.Ecap.SC.Wopi.Contracts.Models.WopiModule
 {
     public class WopiFileInfo
     {

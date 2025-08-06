@@ -1,4 +1,4 @@
-namespace Selise.Ecap.SC.WopiMonitor.Contracts.Constants
+namespace Selise.Ecap.SC.Wopi.Contracts.Constants
 {
     public static class WopiTag
     {

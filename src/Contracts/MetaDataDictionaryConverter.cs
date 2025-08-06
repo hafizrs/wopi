@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts
+namespace Selise.Ecap.SC.Wopi.Contracts
 {
     public class MetaDataDictionaryConverter : System.Text.Json.Serialization.JsonConverter<List<Dictionary<string, object>>>
     {

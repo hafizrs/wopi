@@ -1,17 +1,17 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb;
-using Selise.Ecap.SC.PraxisMonitor.Domain.DomainServices;
-using Selise.Ecap.SC.PraxisMonitor.Domain.DomainServices.Services;
-using Selise.Ecap.SC.PraxisMonitor.Domain.MongoDb;
+using Selise.Ecap.SC.Wopi.Contracts.DomainServices;
+using Selise.Ecap.SC.Wopi.Contracts.MongoDb;
+using Selise.Ecap.SC.Wopi.Domain.DomainServices;
+using Selise.Ecap.SC.Wopi.Domain.DomainServices.Services;
+using Selise.Ecap.SC.Wopi.Domain.MongoDb;
 using SeliseBlocks.MailService.Driver;
 using System;
 using System.Linq;
 using System.Reflection;
 
-public static class PraxisBusinessServiceCollectionExtensions
+public static class WopiBusinessServiceCollectionExtensions
 {
-    public static void AddPraxisBusinessServices(this IServiceCollection services)
+    public static void AddWopiBusinessServices(this IServiceCollection services)
     {
         services.AddTransient<IMongoClientRepository, MongoClientRepository>();
         services.AddTransient<IMongoDataService, MongoDataService>();
@@ -24,7 +24,7 @@ public static class PraxisBusinessServiceCollectionExtensions
         services.AddSingleton<ICreateDynamicLink, CreateDynamicLinkService>();
         services.AddSingleton<IAuthUtilityService, AuthUtilityService>();
         services.AddSingleton<ICreateDynamicLink, CreateDynamicLinkService>();
-        services.AddSingleton<IPraxisFileService, PraxisFileService>();
+        services.AddSingleton<IWopiFileService, WopiFileService>();
     }
 
     public static void RegisterAllDerivedTypes<T>(

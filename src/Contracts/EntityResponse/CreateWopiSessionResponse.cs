@@ -1,4 +1,4 @@
-namespace Selise.Ecap.SC.WopiMonitor.Contracts.EntityResponse
+namespace Selise.Ecap.SC.Wopi.Contracts.EntityResponse
 {
     public class CreateWopiSessionResponse
     {

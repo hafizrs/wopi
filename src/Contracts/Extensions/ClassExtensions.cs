@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.Extensions
+namespace Selise.Ecap.SC.Wopi.Contracts.Extensions
 {
     public static class ClassExtensions
     {

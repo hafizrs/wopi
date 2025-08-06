@@ -2,8 +2,8 @@
 
     <PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
-        <AssemblyName>Selise.Ecap.SC.PraxisMonitor.Domain</AssemblyName>
-        <RootNamespace>Selise.Ecap.SC.PraxisMonitor.Domain</RootNamespace>
+        <AssemblyName>Selise.Ecap.SC.Wopi.Domain</AssemblyName>
+        <RootNamespace>Selise.Ecap.SC.Wopi.Domain</RootNamespace>
         
     </PropertyGroup>
 

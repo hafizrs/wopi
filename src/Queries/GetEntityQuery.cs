@@ -1,4 +1,4 @@
-﻿namespace Selise.Ecap.SC.PraxisMonitor.Queries
+﻿namespace Selise.Ecap.SC.Wopi.Queries
 {
     public class GetEntityQuery
     {

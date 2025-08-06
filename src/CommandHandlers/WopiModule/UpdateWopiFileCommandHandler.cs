@@ -1,12 +1,12 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
-using Selise.Ecap.SC.WopiMonitor.Contracts.Commands.WopiModule;
-using Selise.Ecap.SC.WopiMonitor.Contracts.DomainServices.WopiModule;
+using Selise.Ecap.SC.Wopi.Contracts.Commands.WopiModule;
+using Selise.Ecap.SC.Wopi.Contracts.DomainServices.WopiModule;
 using System;
 using System.Threading.Tasks;
 
-namespace Selise.Ecap.SC.WopiMonitor.CommandHandlers.WopiModule
+namespace Selise.Ecap.SC.Wopi.CommandHandlers.WopiModule
 {
     public class UpdateWopiFileCommandHandler : ICommandHandler<UpdateWopiFileCommand, CommandResponse>
     {

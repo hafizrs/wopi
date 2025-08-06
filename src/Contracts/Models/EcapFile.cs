@@ -1,6 +1,6 @@
 ﻿using Selise.Ecap.Entities.PrimaryEntities.StorageService;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.Models
+namespace Selise.Ecap.SC.Wopi.Contracts.Models
 {
     public class EcapFile: File
     {

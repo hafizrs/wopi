@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Selise.Ecap.SC.PraxisMonitor.ValidationHandlers
+namespace Selise.Ecap.SC.Wopi.ValidationHandlers
 {
     public class ValidationHandler
     {

@@ -2,8 +2,8 @@
 
     <PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
-        <AssemblyName>Selise.Ecap.SC.PraxisMonitor.Events</AssemblyName>
-        <RootNamespace>Selise.Ecap.SC.PraxisMonitor.Events</RootNamespace>
+        <AssemblyName>Selise.Ecap.SC.Wopi.Events</AssemblyName>
+        <RootNamespace>Selise.Ecap.SC.Wopi.Events</RootNamespace>
         
     </PropertyGroup>
 

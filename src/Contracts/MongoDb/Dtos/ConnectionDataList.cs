@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Dtos
+namespace Selise.Ecap.SC.Wopi.Contracts.MongoDb.Dtos
 {
     public class ConnectionDataList
     {

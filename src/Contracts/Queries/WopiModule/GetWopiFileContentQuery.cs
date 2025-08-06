@@ -1,4 +1,4 @@
-namespace Selise.Ecap.SC.WopiMonitor.Contracts.Queries.WopiModule
+namespace Selise.Ecap.SC.Wopi.Contracts.Queries.WopiModule
 {
     public class GetWopiFileContentQuery
     {

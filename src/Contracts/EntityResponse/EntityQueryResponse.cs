@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.EntityResponse
+namespace Selise.Ecap.SC.Wopi.Contracts.EntityResponse
 {
     public class EntityQueryResponse<T>
     {

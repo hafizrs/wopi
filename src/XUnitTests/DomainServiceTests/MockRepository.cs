@@ -1,16 +1,15 @@
-﻿using System;
+﻿using Moq;
+using SeliseBlocks.Genesis.Framework.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Moq;
-using Selise.Ecap.Entities.PrimaryEntities.SmartCity.PraxisMonitor;
-using SeliseBlocks.Genesis.Framework.Infrastructure;
 
 namespace XUnitTests.DomainServiceTests
 {
     public class MockRepository : Mock<IRepository>
     {
-        public MockRepository SetupGetItem<T>(T item) where T: class
+        public MockRepository SetupGetItem<T>(T item) where T : class
         {
             Setup(r => r.GetItem(It.IsAny<Expression<Func<T, bool>>>()))
                 .Returns(item);

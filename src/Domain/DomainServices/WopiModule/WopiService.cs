@@ -1,12 +1,12 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Selise.Ecap.SC.WopiMonitor.Contracts.Commands.WopiModule;
-using Selise.Ecap.SC.WopiMonitor.Contracts.Constants;
-using Selise.Ecap.SC.WopiMonitor.Contracts.DomainServices.WopiModule;
-using Selise.Ecap.SC.WopiMonitor.Contracts.EntityResponse;
-using Selise.Ecap.SC.WopiMonitor.Contracts.Models.WopiModule;
-using Selise.Ecap.SC.WopiMonitor.Contracts.Queries.WopiModule;
+using Selise.Ecap.SC.Wopi.Contracts.Commands.WopiModule;
+using Selise.Ecap.SC.Wopi.Contracts.Constants;
+using Selise.Ecap.SC.Wopi.Contracts.DomainServices.WopiModule;
+using Selise.Ecap.SC.Wopi.Contracts.EntityResponse;
+using Selise.Ecap.SC.Wopi.Contracts.Models.WopiModule;
+using Selise.Ecap.SC.Wopi.Contracts.Queries.WopiModule;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Selise.Ecap.SC.WopiMonitor.Domain.DomainServices.WopiModule
+namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
 {
     public class WopiService : IWopiService
     {

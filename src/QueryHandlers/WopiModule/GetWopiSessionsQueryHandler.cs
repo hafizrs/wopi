@@ -1,12 +1,12 @@
 using SeliseBlocks.Genesis.Framework.Infrastructure;
-using Selise.Ecap.SC.WopiMonitor.Contracts.Queries.WopiModule;
-using Selise.Ecap.SC.WopiMonitor.Contracts.DomainServices.WopiModule;
-using Selise.Ecap.SC.WopiMonitor.Contracts.EntityResponse;
-using Selise.Ecap.SC.WopiMonitor.Contracts.Models;
+using Selise.Ecap.SC.Wopi.Contracts.Queries.WopiModule;
+using Selise.Ecap.SC.Wopi.Contracts.DomainServices.WopiModule;
+using Selise.Ecap.SC.Wopi.Contracts.EntityResponse;
+using Selise.Ecap.SC.Wopi.Contracts.Models;
 using System.Threading.Tasks;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.Models;
+using Selise.Ecap.SC.Wopi.Contracts.Models;
 
-namespace Selise.Ecap.SC.WopiMonitor.QueryHandlers.WopiModule
+namespace Selise.Ecap.SC.Wopi.QueryHandlers.WopiModule
 {
     public class GetWopiSessionsQueryHandler : IQueryHandler<GetWopiSessionsQuery, QueryHandlerResponse>
     {

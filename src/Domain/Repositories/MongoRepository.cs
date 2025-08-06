@@ -5,9 +5,9 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices;
+using Selise.Ecap.SC.Wopi.Contracts.DomainServices;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Domain.Repositories
+namespace Selise.Ecap.SC.Wopi.Domain.Repositories
 {
     public class MongoRepository : IMongoRepository
     {

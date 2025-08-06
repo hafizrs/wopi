@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb
+namespace Selise.Ecap.SC.Wopi.Contracts.MongoDb
 {
     public interface IMongoClientRepository
     {

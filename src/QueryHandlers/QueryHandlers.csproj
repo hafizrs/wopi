@@ -2,8 +2,8 @@
 
     <PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
-        <AssemblyName>Selise.Ecap.SC.PraxisMonitor.QueryHandlers</AssemblyName>
-        <RootNamespace>Selise.Ecap.SC.PraxisMonitor.QueryHandlers</RootNamespace>
+        <AssemblyName>Selise.Ecap.SC.Wopi.QueryHandlers</AssemblyName>
+        <RootNamespace>Selise.Ecap.SC.Wopi.QueryHandlers</RootNamespace>
         
     </PropertyGroup>
 

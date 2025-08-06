@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Utils
+namespace Selise.Ecap.SC.Wopi.Utils
 {
     public static class ExpressionBuilder
     {

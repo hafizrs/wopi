@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices
+namespace Selise.Ecap.SC.Wopi.Contracts.DomainServices
 {
     public interface IUrlShortnerService
     {

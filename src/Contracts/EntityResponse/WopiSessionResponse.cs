@@ -1,8 +1,8 @@
-using Selise.Ecap.SC.WopiMonitor.Contracts.Models.WopiModule;
+using Selise.Ecap.SC.Wopi.Contracts.Models.WopiModule;
 using System;
 using SeliseBlocks.Genesis.Framework.PDS.Entity;
 
-namespace Selise.Ecap.SC.WopiMonitor.Contracts.EntityResponse
+namespace Selise.Ecap.SC.Wopi.Contracts.EntityResponse
 {
     public class WopiSessionResponse : EntityBase
     {

@@ -1,4 +1,4 @@
-﻿namespace Selise.Ecap.SC.PraxisMonitor.Contracts.Models
+﻿namespace Selise.Ecap.SC.Wopi.Contracts.Models
 {
     public class UserLogOutResponse
     {

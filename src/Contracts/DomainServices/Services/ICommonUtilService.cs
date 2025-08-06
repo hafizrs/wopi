@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SeliseBlocks.Genesis.Framework.PDS.Entity;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.EntityResponse;
+using Selise.Ecap.SC.Wopi.Contracts.EntityResponse;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices
+namespace Selise.Ecap.SC.Wopi.Contracts.DomainServices
 {
     public interface ICommonUtilService
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using ObjectsComparer;
 using System.Linq;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Utils
+namespace Selise.Ecap.SC.Wopi.Utils
 {
     public class ObjectCompare
     {

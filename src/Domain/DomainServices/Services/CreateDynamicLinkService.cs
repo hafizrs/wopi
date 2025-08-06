@@ -3,10 +3,10 @@ using System.Net.Http;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.Models;
+using Selise.Ecap.SC.Wopi.Contracts.DomainServices;
+using Selise.Ecap.SC.Wopi.Contracts.Models;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Domain.DomainServices
+namespace Selise.Ecap.SC.Wopi.Domain.DomainServices
 {
     public class CreateDynamicLinkService : ICreateDynamicLink
     {

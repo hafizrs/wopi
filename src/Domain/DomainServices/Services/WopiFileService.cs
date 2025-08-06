@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Selise.Ecap.Entities.PrimaryEntities.StorageService;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.Models;
+using Selise.Ecap.SC.Wopi.Contracts.DomainServices;
+using Selise.Ecap.SC.Wopi.Contracts.Models;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
 using SeliseBlocks.Genesis.Framework.PDS.Entity;
 using System;
@@ -13,16 +13,16 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Domain.DomainServices.Services
+namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.Services
 {
-    public class PraxisFileService : IPraxisFileService
+    public class WopiFileService : IWopiFileService
     {
         private readonly IRepository repository;
         private readonly ISecurityContextProvider _securityContextProvider;
         private readonly IServiceClient _serviceClient;
         private  string _storageServiceBaseUrl;
         private readonly string _storageVersion;
-        public PraxisFileService(IRepository repo, ISecurityContextProvider securityContextProvider,
+        public WopiFileService(IRepository repo, ISecurityContextProvider securityContextProvider,
             IServiceClient serviceClient, IConfiguration configuration)
         {
             repository = repo;

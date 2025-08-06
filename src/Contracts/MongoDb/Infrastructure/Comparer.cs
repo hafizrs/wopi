@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Infrastructure
+namespace Selise.Ecap.SC.Wopi.Contracts.MongoDb.Infrastructure
 {
     public class Comparer<T> : IComparer<T>
     {

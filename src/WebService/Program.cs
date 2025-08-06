@@ -2,14 +2,14 @@
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.Infrastructure;
-using Selise.Ecap.SC.PraxisMonitor.ValidationHandlers;
+using Selise.Ecap.SC.Wopi.Contracts.Infrastructure;
+using Selise.Ecap.SC.Wopi.ValidationHandlers;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Selise.Ecap.SC.PraxisMonitor.WebService
+namespace Selise.Ecap.SC.Wopi.WebService
 {
     internal class Program
     {
@@ -80,8 +80,8 @@ namespace Selise.Ecap.SC.PraxisMonitor.WebService
             container.AddCommandValidator();
             #endregion
 
-            #region Praxis Business
-            container.AddPraxisBusinessServices();
+            #region Wopi Business
+            container.AddWopiBusinessServices();
             #endregion
 
             // Add service locator in the end.

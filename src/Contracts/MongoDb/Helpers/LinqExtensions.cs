@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Helpers
+namespace Selise.Ecap.SC.Wopi.Contracts.MongoDb.Helpers
 {
     public static class LinqExtensions
     {

@@ -1,12 +1,12 @@
-﻿using Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Dtos;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Infrastructure;
+﻿using Selise.Ecap.SC.Wopi.Contracts.MongoDb.Dtos;
+using Selise.Ecap.SC.Wopi.Contracts.MongoDb.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Helpers
+namespace Selise.Ecap.SC.Wopi.Contracts.MongoDb.Helpers
 {
     public class GetFilteredSQLQuery
     {

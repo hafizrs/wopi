@@ -1,12 +1,12 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices;
+using Selise.Ecap.SC.Wopi.Contracts.DomainServices;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Domain.DomainServices
+namespace Selise.Ecap.SC.Wopi.Domain.DomainServices
 {
     public class UrlShortnerService : IUrlShortnerService
     {

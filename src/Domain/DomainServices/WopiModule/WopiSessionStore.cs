@@ -1,8 +1,8 @@
-using Selise.Ecap.SC.WopiMonitor.Contracts.Models.WopiModule;
+using Selise.Ecap.SC.Wopi.Contracts.Models.WopiModule;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace Selise.Ecap.SC.WopiMonitor.Domain.DomainServices.WopiModule
+namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
 {
     public static class WopiSessionStore
     {

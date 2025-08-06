@@ -3,17 +3,17 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Selise.Ecap.Entities.PrimaryEntities.PlatformSpecific;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Dtos;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Helpers;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Infrastructure;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb;
+using Selise.Ecap.SC.Wopi.Contracts.MongoDb.Dtos;
+using Selise.Ecap.SC.Wopi.Contracts.MongoDb.Helpers;
+using Selise.Ecap.SC.Wopi.Contracts.MongoDb.Infrastructure;
+using Selise.Ecap.SC.Wopi.Contracts.MongoDb;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
 using SeliseBlocks.Genesis.Framework.PDS.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Domain.MongoDb
+namespace Selise.Ecap.SC.Wopi.Domain.MongoDb
 {
     public class MongoDataService : IMongoDataService
     {

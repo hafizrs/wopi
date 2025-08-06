@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using ObjectsComparer;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.EntityResponse
+namespace Selise.Ecap.SC.Wopi.Contracts.EntityResponse
 {
     public class ChangeLogResponse
     {

@@ -1,8 +1,8 @@
 ﻿using SeliseBlocks.Genesis.Framework.Infrastructure;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.Models;
+using Selise.Ecap.SC.Wopi.Contracts.Models;
 using System.Threading.Tasks;
 
-namespace Selise.Ecap.SC.PraxisMonitor.QueryHandlers
+namespace Selise.Ecap.SC.Wopi.QueryHandlers
 {
     public abstract class AbstractQueryHandler<TQuery> : IQueryHandler<TQuery, QueryHandlerResponse>
     {

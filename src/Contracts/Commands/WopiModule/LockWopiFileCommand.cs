@@ -1,6 +1,6 @@
-using Selise.Ecap.SC.WopiMonitor.Contracts.Commands;
+using Selise.Ecap.SC.Wopi.Contracts.Commands;
 
-namespace Selise.Ecap.SC.WopiMonitor.Contracts.Commands.WopiModule
+namespace Selise.Ecap.SC.Wopi.Contracts.Commands.WopiModule
 {
     public class LockWopiFileCommand
     {

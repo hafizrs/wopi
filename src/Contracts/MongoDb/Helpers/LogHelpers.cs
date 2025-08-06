@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Helpers
+namespace Selise.Ecap.SC.Wopi.Contracts.MongoDb.Helpers
 {
     public class LogHelpers
     {
@@ -10,7 +10,7 @@ namespace Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Helpers
         public const string ErrorLogMessageFail = "[Log Form Selise.SC.Ecap.MongoDb lib] FAIL ";
         public const string ErrorLogMessageSuccess = "[Log Form Selise.SC.Ecap.MongoDb lib] SUCCESS ";
         public const string ErrorLogMessageException = "[Log Form Selise.SC.Ecap.MongoDb lib] EXCEPTION ";
-        private const string NameSpace = "Selise.Ecap.SC.PraxisMonitor.Domain.Infrastructure";
+        private const string NameSpace = "Selise.Ecap.SC.Wopi.Domain.Infrastructure";
         public static readonly string LogMessageInfo = $"[Log Form {NameSpace}] INFO ";
         public static readonly string LogMessageFail = $"[Log Form {NameSpace}] FAIL ";
         public static readonly string LogMessageSuccess = $"[Log Form {NameSpace}] SUCCESS ";

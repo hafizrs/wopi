@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Utils
+namespace Selise.Ecap.SC.Wopi.Utils
 {
     class SwapVisitor : ExpressionVisitor
     {

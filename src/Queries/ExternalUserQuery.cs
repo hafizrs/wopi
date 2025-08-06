@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Queries
+namespace Selise.Ecap.SC.Wopi.Queries
 {
     public class ExternalUserQuery
     {

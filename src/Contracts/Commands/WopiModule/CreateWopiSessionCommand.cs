@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Selise.Ecap.SC.WopiMonitor.Contracts.Commands.WopiModule
+namespace Selise.Ecap.SC.Wopi.Contracts.Commands.WopiModule
 {
     public class CreateWopiSessionCommand
     {

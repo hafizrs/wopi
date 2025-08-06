@@ -1,6 +1,6 @@
 ﻿using SeliseBlocks.Genesis.Framework.Bus.Contracts.Event;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Events
+namespace Selise.Ecap.SC.Wopi.Events
 {
     public class FileUploadedEvent : BlocksEvent
     {

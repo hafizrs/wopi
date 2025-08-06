@@ -1,7 +1,7 @@
 using SeliseBlocks.Genesis.Framework.PDS.Entity;
 using System;
 
-namespace Selise.Ecap.SC.WopiMonitor.Contracts.Models.WopiModule
+namespace Selise.Ecap.SC.Wopi.Contracts.Models.WopiModule
 {
     public class WopiSession : EntityBase
     {

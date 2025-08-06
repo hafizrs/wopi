@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using MongoDB.Driver;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices
+namespace Selise.Ecap.SC.Wopi.Contracts.DomainServices
 {
     public interface IMongoRepository
     {

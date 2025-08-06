@@ -1,7 +1,7 @@
 ﻿using SeliseBlocks.Genesis.Framework.Infrastructure;
 using System.Threading.Tasks;
 
-namespace Selise.Ecap.SC.PraxisMonitor.CommandHandlers
+namespace Selise.Ecap.SC.Wopi.CommandHandlers
 {
     public abstract class AbstractCommandHandler<TCommand> : ICommandHandler<TCommand, CommandResponse>
     {

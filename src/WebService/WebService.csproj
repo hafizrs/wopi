@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
 	<TargetFramework>net6.0</TargetFramework>
     <AssemblyName>WebService</AssemblyName>
-    <RootNamespace>Selise.Ecap.SC.PraxisMonitor.WebService</RootNamespace>
+    <RootNamespace>Selise.Ecap.SC.Wopi.WebService</RootNamespace>
     
   </PropertyGroup>
 

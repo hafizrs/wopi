@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.Models
+namespace Selise.Ecap.SC.Wopi.Contracts.Models
 {
     public class EntityBaseDto
     {

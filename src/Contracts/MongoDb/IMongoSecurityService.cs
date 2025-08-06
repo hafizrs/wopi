@@ -1,10 +1,10 @@
 ﻿using Selise.Ecap.Entities.PrimaryEntities.PlatformDataService;
 using Selise.Ecap.Entities.PrimaryEntities.Security;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Dtos;
+using Selise.Ecap.SC.Wopi.Contracts.MongoDb.Dtos;
 using System;
 using System.Collections.Generic;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb
+namespace Selise.Ecap.SC.Wopi.Contracts.MongoDb
 {
     public interface IMongoSecurityService
     {

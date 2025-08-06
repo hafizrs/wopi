@@ -1,13 +1,13 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Dtos;
+using Selise.Ecap.SC.Wopi.Contracts.MongoDb.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Infrastructure
+namespace Selise.Ecap.SC.Wopi.Contracts.MongoDb.Infrastructure
 {
     public static class FilterBuilder
     {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.Infrastructure
+namespace Selise.Ecap.SC.Wopi.Contracts.Infrastructure
 {
     public class MongoDBQueryResponse<T>
     {

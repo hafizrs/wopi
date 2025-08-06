@@ -1,4 +1,4 @@
-﻿namespace Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Infrastructure
+﻿namespace Selise.Ecap.SC.Wopi.Contracts.MongoDb.Infrastructure
 {
     public class ComplexValue
     {

@@ -1,12 +1,12 @@
-﻿using Selise.Ecap.SC.PraxisMonitor.Contracts.EntityResponse;
+﻿using Selise.Ecap.SC.Wopi.Contracts.EntityResponse;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.Models;
+using Selise.Ecap.SC.Wopi.Contracts.Models;
 using File = Selise.Ecap.Entities.PrimaryEntities.StorageService.File;
 using System.Threading;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices
+namespace Selise.Ecap.SC.Wopi.Contracts.DomainServices
 {
     public interface IStorageDataService
     {

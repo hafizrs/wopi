@@ -1,4 +1,4 @@
-namespace Selise.Ecap.SC.WopiMonitor.Contracts.DomainServices.WopiModule
+namespace Selise.Ecap.SC.Wopi.Contracts.DomainServices.WopiModule
 {
     public interface IWopiPermissionService
     {

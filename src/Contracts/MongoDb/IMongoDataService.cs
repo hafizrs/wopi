@@ -1,12 +1,12 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb.Dtos;
+using Selise.Ecap.SC.Wopi.Contracts.MongoDb.Dtos;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
 using SeliseBlocks.Genesis.Framework.PDS.Entity;
 using System;
 using System.Collections.Generic;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.MongoDb
+namespace Selise.Ecap.SC.Wopi.Contracts.MongoDb
 {
     public interface IMongoDataService
     {

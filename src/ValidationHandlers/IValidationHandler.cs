@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Selise.Ecap.SC.PraxisMonitor.ValidationHandlers
+namespace Selise.Ecap.SC.Wopi.ValidationHandlers
 {
     public interface IValidationHandler<TCommand, TResponse>
     {

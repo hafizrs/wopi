@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.Infrastructure
+namespace Selise.Ecap.SC.Wopi.Contracts.Infrastructure
 {
     public static class ServiceLocator
     {

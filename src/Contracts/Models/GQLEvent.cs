@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Contracts.Models
+namespace Selise.Ecap.SC.Wopi.Contracts.Models
 {
     public class GqlEvent<T>
     {

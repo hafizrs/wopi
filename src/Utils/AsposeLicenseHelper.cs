@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Selise.Ecap.SC.PraxisMonitor.Utils
+namespace Selise.Ecap.SC.Wopi.Utils
 {
     public class AsposeLicenseHelper
     {

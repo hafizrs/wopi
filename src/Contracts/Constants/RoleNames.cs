@@ -1,4 +1,4 @@
-﻿namespace Selise.Ecap.SC.PraxisMonitor.Contracts.Constants
+﻿namespace Selise.Ecap.SC.Wopi.Contracts.Constants
 {
     public class RoleNames
     {
