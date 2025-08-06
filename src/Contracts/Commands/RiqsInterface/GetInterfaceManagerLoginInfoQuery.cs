@@ -1,0 +1,10 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Selise.Ecap.SC.PraxisMonitor.Contracts.Commands.RiqsInterface
+{
+    public class GetInterfaceManagerLoginInfoQuery
+    {
+        [Required]
+        public string Provider { get; set; }
+    }
+}

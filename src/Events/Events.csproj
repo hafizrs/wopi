@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+        <AssemblyName>Selise.Ecap.SC.PraxisMonitor.Events</AssemblyName>
+        <RootNamespace>Selise.Ecap.SC.PraxisMonitor.Events</RootNamespace>
+        
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="12.0.1" />
+        <PackageReference Include="HtmlAgilityPack" Version="1.11.60" />
+        <PackageReference Include="SeliseBlocks.Entities" Version="25.7.2.6" />
+		<PackageReference Include="SeliseBlocks.Genesis.Framework.Esb.Producer" Version="6.0.1.2" />
+    </ItemGroup>
+</Project>

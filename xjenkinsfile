@@ -1,0 +1,140 @@
+def DEV_WEB_CONTAINER_NAME="dev-web-praxismonitor"
+def DEV_WIN_CONTAINER_NAME="dev-windows-praxismonitor"
+def DEV_KUBE_DEPLOYMENT= "dev-ecap-praxismonitor"
+def CONTAINER_TAG="latest"
+def DOCKER_REGISTRY="jenkins-server:5000"
+def DEV_NAMESPACE="praxismonitor"
+
+def SERVICE_NAME="praxismonitor"
+
+def STG_NAMESPACE="praxismonitor"
+def STG_KUBE_DEPLOYMENT= "stg-ecap-praxismonitor"
+def STG_WEB_CONTAINER_NAME="stg-web-praxismonitor"
+def STG_WIN_CONTAINER_NAME="stg-windows-praxismonitor"
+
+def PROD_NAMESPACE="prod-praxismonitor"
+def PROD_KUBE_DEPLOYMENT= "prod-ecap-praxismonitor"
+def PROD_WEB_CONTAINER_NAME="prod-web-praxismonitor"
+def PROD_WIN_CONTAINER_NAME="prod-windows-praxismonitor"
+def ECR="https://500986409600.dkr.ecr.eu-central-1.amazonaws.com"
+def ECR_URI="500986409600.dkr.ecr.eu-central-1.amazonaws.com"
+
+node {
+    def app
+    def app2
+
+    if (env.BRANCH_NAME == "dev") {
+      stage('DEV: Cleaning ENV') {
+          sh "sudo docker rmi -f ${DEV_WEB_CONTAINER_NAME}:${CONTAINER_TAG} ${DEV_WIN_CONTAINER_NAME}:${CONTAINER_TAG}"
+          sh "sudo docker rmi -f ${DOCKER_REGISTRY}/${DEV_WEB_CONTAINER_NAME} ${DOCKER_REGISTRY}/${DEV_WIN_CONTAINER_NAME}"
+    }}
+
+    if (env.BRANCH_NAME == "release") {
+      stage('STG: Cleaning ENV') {
+
+          sh "sudo docker rmi -f ${STG_WEB_CONTAINER_NAME}:${CONTAINER_TAG} ${STG_WIN_CONTAINER_NAME}:${CONTAINER_TAG}"
+          sh "sudo docker rmi -f ${ECR_URI}/${STG_WEB_CONTAINER_NAME} ${ECR_URI}/${STG_WIN_CONTAINER_NAME}"
+    }}
+
+    if (env.BRANCH_NAME == "master") {
+      stage('PROD: Cleaning ENV') {
+
+          sh "sudo docker rmi -f ${PROD_WEB_CONTAINER_NAME}:${CONTAINER_TAG} ${PROD_WIN_CONTAINER_NAME}:${CONTAINER_TAG}"
+          sh "sudo docker rmi -f ${ECR_URI}/${PROD_WEB_CONTAINER_NAME} ${ECR_URI}/${PROD_WIN_CONTAINER_NAME}"
+    }}
+
+    stage('Clone DEV repository') {
+        /* repository cloned to our workspace */
+        checkout scm
+    }
+
+
+    if (env.BRANCH_NAME == "dev") {
+      stage('DEV: Build Image') {
+          /* This builds the actual image */
+
+          app = docker.build(DEV_WEB_CONTAINER_NAME, "--build-arg git_branch=${env.BRANCH_NAME} .")
+          app2 = docker.build(DEV_WIN_CONTAINER_NAME, "-f win.Dockerfile --build-arg git_branch=${env.BRANCH_NAME} .")
+    }}
+
+    if (env.BRANCH_NAME == "release") {
+      stage('STG: Build Image') {
+          /* This builds the actual image */
+
+          app = docker.build(STG_WEB_CONTAINER_NAME, "--build-arg git_branch=${env.BRANCH_NAME} .")
+          app2 = docker.build(STG_WIN_CONTAINER_NAME, "-f win.Dockerfile --build-arg git_branch=${env.BRANCH_NAME} .")
+    }}
+
+    if (env.BRANCH_NAME == "master") {
+      stage('PROD: Build Image') {
+          /* This builds the actual image */
+
+          app = docker.build(PROD_WEB_CONTAINER_NAME, "--build-arg git_branch=${env.BRANCH_NAME} .")
+          app2 = docker.build(PROD_WIN_CONTAINER_NAME, "-f win.Dockerfile --build-arg git_branch=${env.BRANCH_NAME} .")
+    }}
+
+
+    stage('Test image') {
+         sh "echo 'test passed'"
+    }
+
+
+    if (env.BRANCH_NAME == "dev") {
+      stage('DEV: Push image') {
+        docker.withRegistry("http://${DOCKER_REGISTRY}/") {
+            app.push("${env.BUILD_NUMBER}")
+            app2.push("${env.BUILD_NUMBER}")
+          }
+    }}
+
+    if (env.BRANCH_NAME == "release") {
+      stage('STG: Push image') {
+
+          docker.withRegistry("${ECR}", 'ecr:eu-central-1:ecr-credentials') {
+            app.push("kube${BUILD_NUMBER}")
+            app2.push("kube${BUILD_NUMBER}")
+          }
+    }}
+
+    if (env.BRANCH_NAME == "master") {
+      stage('PROD: Push image') {
+
+          docker.withRegistry("${ECR}", 'ecr:eu-central-1:ecr-credentials') {
+            app.push("kube${BUILD_NUMBER}")
+            app2.push("kube${BUILD_NUMBER}")
+          }
+    }}
+
+
+    if (env.BRANCH_NAME == "dev") {
+      stage('Deploy DEV') {
+
+        sh """ssh ubuntu@dev-kube-master /bin/bash <<EOF
+ kubectl set image deployment/${DEV_KUBE_DEPLOYMENT} ${DEV_WEB_CONTAINER_NAME}=${DOCKER_REGISTRY}/${DEV_WEB_CONTAINER_NAME}:${env.BUILD_NUMBER} -n ${DEV_NAMESPACE}
+ kubectl set image deployment/${DEV_WIN_CONTAINER_NAME} ${DEV_WIN_CONTAINER_NAME}=${DOCKER_REGISTRY}/${DEV_WIN_CONTAINER_NAME}:${env.BUILD_NUMBER} -n ${DEV_NAMESPACE}
+EOF"""
+
+    }}
+
+    if (env.BRANCH_NAME == "release") {
+      stage('Deploy STG') {
+
+        sh """ssh ubuntu@kube-master-stage /bin/bash <<EOF
+ kubectl set image deployment/${STG_KUBE_DEPLOYMENT} ${STG_WEB_CONTAINER_NAME}=${ECR_URI}/${STG_WEB_CONTAINER_NAME}:kube${env.BUILD_NUMBER} -n ${STG_NAMESPACE}
+ kubectl set image deployment/${STG_WIN_CONTAINER_NAME} ${STG_WIN_CONTAINER_NAME}=${ECR_URI}/${STG_WIN_CONTAINER_NAME}:kube${env.BUILD_NUMBER} -n ${STG_NAMESPACE}
+EOF"""
+
+    }}
+
+    if (env.BRANCH_NAME == "master") {
+      stage('Deploy PROD') {
+
+        sh """ssh ubuntu@kube-master /bin/bash <<EOF
+ kubectl set image deployment/${PROD_KUBE_DEPLOYMENT} ${PROD_WEB_CONTAINER_NAME}=${ECR_URI}/${PROD_WEB_CONTAINER_NAME}:kube${env.BUILD_NUMBER} -n ${PROD_NAMESPACE}
+ kubectl set image deployment/${PROD_WIN_CONTAINER_NAME} ${PROD_WIN_CONTAINER_NAME}=${ECR_URI}/${PROD_WIN_CONTAINER_NAME}:kube${env.BUILD_NUMBER} -n ${PROD_NAMESPACE}
+EOF"""
+
+    }}
+
+}
+
