@@ -1,24 +1,22 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Selise.Ecap.SC.WopiMonitor.Contracts.DomainServices.WopiModule;
-using Selise.Ecap.SC.WopiMonitor.Domain.DomainServices.WopiModule;
-using Selise.Ecap.SC.WopiMonitor.Validators;
+using System.Linq;
+using System.Reflection;
 
-namespace Selise.Ecap.SC.WopiMonitor.WebService
+namespace Selise.Ecap.SC.PraxisMonitor.WebService
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddWopiModuleServices(this IServiceCollection services)
+        public static void RegisterAllDerivedTypes<T>(
+            this IServiceCollection services,
+            Assembly[] assemblies,
+            ServiceLifetime lifetime = ServiceLifetime.Singleton
+        )
         {
-            services.AddScoped<IWopiService, WopiService>();
-            services.AddScoped<IWopiPermissionService, WopiPermissionService>();
-            return services;
-        }
-
-        public static IServiceCollection AddWopiModuleCommandValidators(this IServiceCollection services)
-        {
-            services.AddScoped<CreateWopiSessionCommandValidator>();
-            services.AddScoped<DeleteWopiSessionCommandValidator>();
-            return services;
+            var typesFromAssemblies = assemblies.SelectMany(
+                a => a.DefinedTypes.Where(x => x.BaseType == typeof(T) || x.GetInterfaces().Contains(typeof(T)))
+            );
+            foreach (var type in typesFromAssemblies)
+                services.Add(new ServiceDescriptor(typeof(T), type, lifetime));
         }
     }
 }

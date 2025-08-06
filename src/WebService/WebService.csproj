@@ -1,27 +1,23 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <OutputType>Exe</OutputType>
+	<TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>WebService</AssemblyName>
+    <RootNamespace>Selise.Ecap.SC.PraxisMonitor.WebService</RootNamespace>
+    
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="SeliseBlocks.Genesis.Framework" Version="6.0.0" />
+    <PackageReference Include="SeliseBlocks.Entities" Version="25.7.2.6" />
+	<PackageReference Include="SeliseBlocks.Genesis.Framework.Api" Version="6.0.1.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\CommandHandlers\CommandHandlers.csproj" />
+    <ProjectReference Include="..\Domain\Domain.csproj" />
+    <ProjectReference Include="..\Queries\Queries.csproj" />
     <ProjectReference Include="..\QueryHandlers\QueryHandlers.csproj" />
-    <ProjectReference Include="..\Validators\Validators.csproj" />
-    <ProjectReference Include="..\ValidationHandlers\ValidationHandlers.csproj" />
-    <ProjectReference Include="..\Contracts\Contracts.csproj" />
-    <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>

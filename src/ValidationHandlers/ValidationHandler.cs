@@ -1,34 +1,21 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Selise.Ecap.SC.WopiMonitor.Contracts.Infrastructure;
-using SeliseBlocks.Genesis.Framework.Infrastructure;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
-namespace Selise.Ecap.SC.WopiMonitor.ValidationHandlers
+namespace Selise.Ecap.SC.PraxisMonitor.ValidationHandlers
 {
-    public class ValidationHandler : IValidationHandler
+    public class ValidationHandler
     {
         private readonly IServiceProvider _serviceProvider;
-
         public ValidationHandler(IServiceProvider serviceProvider)
         {
-            _serviceProvider = serviceProvider;
+            this._serviceProvider = serviceProvider;
         }
 
-        public async Task<CommandResponse> SubmitAsync<TCommand, TResponse>(TCommand command) where TCommand : class
+        public async Task<TResponse> SubmitAsync<TCommand, TResponse>(TCommand command)
         {
-            var validatorType = typeof(IValidationHandler<,>).MakeGenericType(typeof(TCommand), typeof(TResponse));
-            var validator = _serviceProvider.GetService(validatorType);
+            var validationHandler = _serviceProvider.GetService(typeof(IValidationHandler<TCommand, TResponse>)) as IValidationHandler<TCommand, TResponse>;
 
-            if (validator == null)
-            {
-                return new CommandResponse();
-            }
-
-            var method = validatorType.GetMethod("Validate");
-            var result = method.Invoke(validator, new object[] { command });
-
-            return await Task.FromResult((CommandResponse)result);
+            return await validationHandler?.ValidateAsync(command);
         }
     }
 }

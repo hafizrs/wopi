@@ -6,6 +6,7 @@ using Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices;
 using Selise.Ecap.SC.PraxisMonitor.Contracts.Models;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Selise.Ecap.SC.PraxisMonitor.Validators
@@ -63,10 +64,10 @@ namespace Selise.Ecap.SC.PraxisMonitor.Validators
                 plan.RuleFor(x => x.Color)
                     .NotEmpty().WithMessage("Color can't be null or empty.");
                 
-                plan.RuleFor(x => x.MaintenanceId)
-                    .Must(IsMaintenanceIdValid)
-                    .WithMessage("No Maintenance found with provided maintenanceId.")
-                    .When(x => !string.IsNullOrEmpty(x.MaintenanceId));
+                plan.RuleForEach(x => x.MaintenanceAttachments)
+                    .Must(IsMaintenanceAttachmentValid)
+                    .WithMessage("There are one or more issues with Maintenance Attachment")
+                    .When(x => x.MaintenanceAttachments.Count > 0);
             });
         }
 
@@ -89,11 +90,20 @@ namespace Selise.Ecap.SC.PraxisMonitor.Validators
             return existingShiftPlan.Shift.ShiftName;
         }
 
-        private bool IsMaintenanceIdValid(string maintenanceId)
+        private bool IsMaintenanceAttachmentValid(ShiftMaintenanceAttachment maintenanceAttachment)
         {
-            if (string.IsNullOrEmpty(maintenanceId)) return true;
-            var maintenance = _repository.GetItem<PraxisEquipmentMaintenance>(m => m.ItemId == maintenanceId);
-            return maintenance != null;
+            if (string.IsNullOrEmpty(maintenanceAttachment.MaintenanceId)) return true;
+            var maintenance = _repository.GetItem<PraxisEquipmentMaintenance>(m => m.ItemId == maintenanceAttachment.MaintenanceId);
+            if (maintenance == null) return false;
+            var originalExecitingUserIds = maintenance.ExecutivePersonIds ?? new List<string>();
+            if (originalExecitingUserIds.Count() > 0)
+            {
+                var isValid = maintenanceAttachment.ExecutivePersonIds.Count == 0
+                    || maintenanceAttachment.ExecutivePersonIds.All(userId => originalExecitingUserIds.Contains(userId));
+                if (!isValid) return false;
+            }
+            if (maintenanceAttachment.ExecutionDate > maintenance.MaintenanceEndDate) return false;
+            return true;
         }
 
         public ValidationResult IsSatisfiedby(CreateShiftPlanCommand command)

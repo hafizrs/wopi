@@ -1,14 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+    <PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+        <AssemblyName>Selise.Ecap.SC.PraxisMonitor.Contracts</AssemblyName>
+        <RootNamespace>Selise.Ecap.SC.PraxisMonitor.Contracts</RootNamespace>
+        
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="11.0.0" />
-    <PackageReference Include="SeliseBlocks.Genesis.Framework" Version="6.0.0" />
-  </ItemGroup>
+    <ItemGroup>
+      <Compile Remove="RiqsInterface\**" />
+      <EmbeddedResource Remove="RiqsInterface\**" />
+      <None Remove="RiqsInterface\**" />
+    </ItemGroup>
 
+    <ItemGroup>
+     
+        <PackageReference Include="ObjectsComparer" Version="1.4.1" />
+        <PackageReference Include="EPPlus" Version="5.1.0" />
+        <PackageReference Include="SeliseBlocks.Notifier.Dtos" Version="6.0.0.1" />
+        <PackageReference Include="SeliseBlocks.MailService.Driver" Version="6.0.1.1" />
+        <PackageReference Include="SeliseBlocks.GraphQL.Extensions" Version="24.2.29.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Events\Events.csproj" />
+    </ItemGroup>
 </Project>

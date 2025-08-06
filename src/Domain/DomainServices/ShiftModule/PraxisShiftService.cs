@@ -149,7 +149,7 @@ namespace Selise.Ecap.SC.PraxisMonitor.Domain.DomainServices.Services
                         IsProcessGuidCreated = false,
                         TimezoneOffsetInMinutes = shiftPlan.TimezoneOffsetInMinutes,
                         Color = shiftPlan.Color,
-                        AttachedMaintenanceId = shiftPlan.MaintenanceId,
+                        AttachedMaintenances = shiftPlan.MaintenanceAttachments,
                         Location = shiftPlan.Location,
                         DepartmentId = command.DepartmentId
                     };
@@ -360,32 +360,32 @@ namespace Selise.Ecap.SC.PraxisMonitor.Domain.DomainServices.Services
                 foreach (var shiftPlan in shiftPlans)
                 {
                     foreach (var newShiftPlan in from cloneToDate in command.CloneToDates
-                                            select DateTime.SpecifyKind(cloneToDate, DateTimeKind.Utc)
+                                                 select DateTime.SpecifyKind(cloneToDate, DateTimeKind.Utc)
                                             into utcShiftPlanDate
-                                            where !IsShiftPlanExist(utcShiftPlanDate, shiftPlan.Shift.ItemId)
-                                            let shift = shiftPlan.Shift
-                                            select new RiqsShiftPlan
-                                            {
-                                                ItemId = Guid.NewGuid().ToString(),
-                                                CreateDate = DateTime.UtcNow.ToLocalTime(),
-                                                LastUpdateDate = DateTime.UtcNow.ToLocalTime(),
-                                                CreatedBy = securityContext.UserId,
-                                                TenantId = securityContext.TenantId,
-                                                Language = securityContext.Language,
-                                                Tags = new[] { PraxisTag.IsValidRiqsShiftPlan },
-                                                RolesAllowedToRead = readRoles,
-                                                RolesAllowedToUpdate = updateRoles,
-                                                RolesAllowedToDelete = deleteRoles,
-                                                Shift = shift,
-                                                ShiftDate = utcShiftPlanDate,
-                                                PraxisUserIds = shiftPlan.PraxisUserIds,
-                                                IsProcessGuidCreated = false,
-                                                Color = shiftPlan.Color,
-                                                Location = shiftPlan.Location,
-                                                AttachedMaintenanceId = shiftPlan.AttachedMaintenanceId,
-                                                DepartmentId = shiftPlan.DepartmentId,
-                                                OrganizationId = shiftPlan.OrganizationId
-                                            })
+                                                 where !IsShiftPlanExist(utcShiftPlanDate, shiftPlan.Shift.ItemId)
+                                                 let shift = shiftPlan.Shift
+                                                 select new RiqsShiftPlan
+                                                 {
+                                                     ItemId = Guid.NewGuid().ToString(),
+                                                     CreateDate = DateTime.UtcNow.ToLocalTime(),
+                                                     LastUpdateDate = DateTime.UtcNow.ToLocalTime(),
+                                                     CreatedBy = securityContext.UserId,
+                                                     TenantId = securityContext.TenantId,
+                                                     Language = securityContext.Language,
+                                                     Tags = new[] { PraxisTag.IsValidRiqsShiftPlan },
+                                                     RolesAllowedToRead = readRoles,
+                                                     RolesAllowedToUpdate = updateRoles,
+                                                     RolesAllowedToDelete = deleteRoles,
+                                                     Shift = shift,
+                                                     ShiftDate = utcShiftPlanDate,
+                                                     PraxisUserIds = shiftPlan.PraxisUserIds,
+                                                     IsProcessGuidCreated = false,
+                                                     Color = shiftPlan.Color,
+                                                     Location = shiftPlan.Location,
+                                                     AttachedMaintenances = shiftPlan.AttachedMaintenances,
+                                                     DepartmentId = shiftPlan.DepartmentId,
+                                                     OrganizationId = shiftPlan.OrganizationId
+                                                 })
                     {
                         await _repository.SaveAsync(newShiftPlan);
                     }

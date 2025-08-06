@@ -1,7 +1,4 @@
-﻿using Selise.Ecap.Entities.PrimaryEntities.SmartCity.PraxisMonitor.LibraryModule;
-using Selise.Ecap.Entities.PrimaryEntities.SmartCity.PraxisMonitor.Shared;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.Models;
-using SeliseBlocks.Genesis.Framework.PDS.Entity;
+﻿using Selise.Ecap.SC.PraxisMonitor.Contracts.Models;
 using System;
 using System.Collections.Generic;
 
@@ -24,6 +21,6 @@ namespace Selise.Ecap.SC.PraxisMonitor.Contracts.Commands
         public List<DateTime> CloneToDates { get; set; }
         public string Color { get; set; }
         public string Location { get; set; }
-        public string MaintenanceId { get; set; }
+        public List<ShiftMaintenanceAttachment> MaintenanceAttachments { get; set; } = new List<ShiftMaintenanceAttachment>();
     }
 }

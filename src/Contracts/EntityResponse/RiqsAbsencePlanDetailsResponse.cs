@@ -38,6 +38,7 @@ namespace Selise.Ecap.SC.PraxisMonitor.Contracts.EntityResponse
         public string ReasonToDeny { get; set; }
         public DateTime? StatusUpdatedOn { get; set; }
         public string DepartmentId { get; set; }
+        public CreatorInfo CreatorInfo { get; set; }
     }
 
     [BsonIgnoreExtraElements]
@@ -49,5 +50,11 @@ namespace Selise.Ecap.SC.PraxisMonitor.Contracts.EntityResponse
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public AbsencePlanStatus Status { get; set; }
+    }
+
+    public class  CreatorInfo
+    {
+        public string PraxisUserId { get; set; }
+        public string Name { get; set; }
     }
 }
