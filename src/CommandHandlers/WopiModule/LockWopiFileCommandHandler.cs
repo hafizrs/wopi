@@ -4,6 +4,8 @@ using Selise.Ecap.SC.WopiMonitor.Contracts.Commands;
 using Selise.Ecap.SC.WopiMonitor.Contracts.Commands.WopiModule;
 using Selise.Ecap.SC.WopiMonitor.Contracts.DomainServices.WopiModule;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
+using System;
+using System.Threading.Tasks;
 
 namespace Selise.Ecap.SC.WopiMonitor.CommandHandlers.WopiModule
 {

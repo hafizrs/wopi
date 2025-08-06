@@ -1,7 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
 using Moq;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.Models.AbsenceModule;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +11,8 @@ namespace XUnitTests.DomainServiceTests
     public class MockEcapMongoDbDataContextProvider : Mock<IBlocksMongoDbDataContextProvider>
     {
         private readonly Mock<IMongoDatabase> _mockDataContext;
-        private readonly Mock<IMongoCollection<RiqsAbsenceType>> _mockAbsenceTypeCollection;
-        private readonly Mock<IMongoCollection<RiqsAbsencePlan>> _mockAbsencePlanCollection;
+        //private readonly Mock<IMongoCollection<RiqsAbsenceType>> _mockAbsenceTypeCollection;
+        //private readonly Mock<IMongoCollection<RiqsAbsencePlan>> _mockAbsencePlanCollection;
 
         public MockEcapMongoDbDataContextProvider()
         {
@@ -21,8 +20,8 @@ namespace XUnitTests.DomainServiceTests
             _mockDataContext = new Mock<IMongoDatabase>();
 
             // Create mock collections
-            _mockAbsenceTypeCollection = new Mock<IMongoCollection<RiqsAbsenceType>>();
-            _mockAbsencePlanCollection = new Mock<IMongoCollection<RiqsAbsencePlan>>();
+            //_mockAbsenceTypeCollection = new Mock<IMongoCollection<RiqsAbsenceType>>();
+            //_mockAbsencePlanCollection = new Mock<IMongoCollection<RiqsAbsencePlan>>();
 
             //// Setup InsertManyAsync for RiqsAbsenceType
             //_mockAbsenceTypeCollection
@@ -77,13 +76,13 @@ namespace XUnitTests.DomainServiceTests
             // Setup 
 
             // Setup collections by name to match the actual collection names used in AbsenceOverviewService
-            _mockDataContext
-                .Setup(d => d.GetCollection<RiqsAbsenceType>("RiqsAbsenceTypes", null))
-                .Returns(_mockAbsenceTypeCollection.Object);
+            //_mockDataContext
+            //    .Setup(d => d.GetCollection<RiqsAbsenceType>("RiqsAbsenceTypes", null))
+            //    .Returns(_mockAbsenceTypeCollection.Object);
 
-            _mockDataContext
-                .Setup(d => d.GetCollection<RiqsAbsencePlan>("RiqsAbsencePlans", null))
-                .Returns(_mockAbsencePlanCollection.Object);
+            //_mockDataContext
+            //    .Setup(d => d.GetCollection<RiqsAbsencePlan>("RiqsAbsencePlans", null))
+            //    .Returns(_mockAbsencePlanCollection.Object);
 
             Setup(p => p.GetTenantDataContext()).Returns(_mockDataContext.Object);
         }
@@ -116,96 +115,96 @@ namespace XUnitTests.DomainServiceTests
         // Method to configure DeleteManyAsync to return custom delete count
         public MockEcapMongoDbDataContextProvider SetupDeleteManyAsync<T>(long deleteCount) where T : class
         {
-            if (typeof(T) == typeof(RiqsAbsenceType))
-            {
-                _mockAbsenceTypeCollection
-                    .Setup(c => c.DeleteManyAsync(
-                        It.IsAny<FilterDefinition<RiqsAbsenceType>>(),
-                        default))
-                    .ReturnsAsync(new DeleteResult.Acknowledged(deleteCount));
-            }
-            else if (typeof(T) == typeof(RiqsAbsencePlan))
-            {
-                _mockAbsencePlanCollection
-                    .Setup(c => c.DeleteManyAsync(
-                        It.IsAny<FilterDefinition<RiqsAbsencePlan>>(),
-                        default))
-                    .ReturnsAsync(new DeleteResult.Acknowledged(deleteCount));
-            }
+            //if (typeof(T) == typeof(RiqsAbsenceType))
+            //{
+            //    _mockAbsenceTypeCollection
+            //        .Setup(c => c.DeleteManyAsync(
+            //            It.IsAny<FilterDefinition<RiqsAbsenceType>>(),
+            //            default))
+            //        .ReturnsAsync(new DeleteResult.Acknowledged(deleteCount));
+            //}
+            //else if (typeof(T) == typeof(RiqsAbsencePlan))
+            //{
+            //    _mockAbsencePlanCollection
+            //        .Setup(c => c.DeleteManyAsync(
+            //            It.IsAny<FilterDefinition<RiqsAbsencePlan>>(),
+            //            default))
+            //        .ReturnsAsync(new DeleteResult.Acknowledged(deleteCount));
+            //}
 
             return this;
         }
 
         public MockEcapMongoDbDataContextProvider SetupInsertOneAsync<T>() where T : class
         {
-            if (typeof(T) == typeof(RiqsAbsenceType))
-            {
-                _mockAbsenceTypeCollection
-                    .Setup(c => c.InsertOneAsync(
-                        It.IsAny<RiqsAbsenceType>(),
-                        It.IsAny<InsertOneOptions>(),
-                        default))
-                    .Returns(Task.CompletedTask);
-            }
-            else if (typeof(T) == typeof(RiqsAbsencePlan))
-            {
-                _mockAbsencePlanCollection
-                    .Setup(c => c.InsertOneAsync(
-                        It.IsAny<RiqsAbsencePlan>(),
-                        It.IsAny<InsertOneOptions>(),
-                        default))
-                    .Returns(Task.CompletedTask);
-            }
+            //if (typeof(T) == typeof(RiqsAbsenceType))
+            //{
+            //    _mockAbsenceTypeCollection
+            //        .Setup(c => c.InsertOneAsync(
+            //            It.IsAny<RiqsAbsenceType>(),
+            //            It.IsAny<InsertOneOptions>(),
+            //            default))
+            //        .Returns(Task.CompletedTask);
+            //}
+            //else if (typeof(T) == typeof(RiqsAbsencePlan))
+            //{
+            //    _mockAbsencePlanCollection
+            //        .Setup(c => c.InsertOneAsync(
+            //            It.IsAny<RiqsAbsencePlan>(),
+            //            It.IsAny<InsertOneOptions>(),
+            //            default))
+            //        .Returns(Task.CompletedTask);
+            //}
 
             return this;
         }
 
         public MockEcapMongoDbDataContextProvider SetupInsertManyAsync<T>() where T : class
         {
-            if (typeof(T) == typeof(RiqsAbsenceType))
-            {
-                _mockAbsenceTypeCollection
-                    .Setup(c => c.InsertManyAsync(
-                        It.IsAny<IEnumerable<RiqsAbsenceType>>(),
-                        It.IsAny<InsertManyOptions>(),
-                        default))
-                    .Returns(Task.CompletedTask);
-            }
-            else if (typeof(T) == typeof(RiqsAbsencePlan))
-            {
-                _mockAbsencePlanCollection
-                    .Setup(c => c.InsertManyAsync(
-                        It.IsAny<IEnumerable<RiqsAbsencePlan>>(),
-                        It.IsAny<InsertManyOptions>(),
-                        default))
-                    .Returns(Task.CompletedTask);
-            }
+            //if (typeof(T) == typeof(RiqsAbsenceType))
+            //{
+            //    _mockAbsenceTypeCollection
+            //        .Setup(c => c.InsertManyAsync(
+            //            It.IsAny<IEnumerable<RiqsAbsenceType>>(),
+            //            It.IsAny<InsertManyOptions>(),
+            //            default))
+            //        .Returns(Task.CompletedTask);
+            //}
+            //else if (typeof(T) == typeof(RiqsAbsencePlan))
+            //{
+            //    _mockAbsencePlanCollection
+            //        .Setup(c => c.InsertManyAsync(
+            //            It.IsAny<IEnumerable<RiqsAbsencePlan>>(),
+            //            It.IsAny<InsertManyOptions>(),
+            //            default))
+            //        .Returns(Task.CompletedTask);
+            //}
 
             return this;
         }
 
         public MockEcapMongoDbDataContextProvider SetupUpdateOneAsync<T>(long matchedCount, long modifiedCount) where T : class
         {
-            if (typeof(T) == typeof(RiqsAbsenceType))
-            {
-                _mockAbsenceTypeCollection
-                    .Setup(c => c.UpdateOneAsync(
-                        It.IsAny<FilterDefinition<RiqsAbsenceType>>(),
-                        It.IsAny<UpdateDefinition<RiqsAbsenceType>>(),
-                        It.IsAny<UpdateOptions>(),
-                        default))
-                    .ReturnsAsync(new UpdateResult.Acknowledged(matchedCount, modifiedCount, null));
-            }
-            else if (typeof(T) == typeof(RiqsAbsencePlan))
-            {
-                _mockAbsencePlanCollection
-                    .Setup(c => c.UpdateOneAsync(
-                        It.IsAny<FilterDefinition<RiqsAbsencePlan>>(),
-                        It.IsAny<UpdateDefinition<RiqsAbsencePlan>>(),
-                        It.IsAny<UpdateOptions>(),
-                        default))
-                    .ReturnsAsync(new UpdateResult.Acknowledged(matchedCount, modifiedCount, null));
-            }
+            //if (typeof(T) == typeof(RiqsAbsenceType))
+            //{
+            //    _mockAbsenceTypeCollection
+            //        .Setup(c => c.UpdateOneAsync(
+            //            It.IsAny<FilterDefinition<RiqsAbsenceType>>(),
+            //            It.IsAny<UpdateDefinition<RiqsAbsenceType>>(),
+            //            It.IsAny<UpdateOptions>(),
+            //            default))
+            //        .ReturnsAsync(new UpdateResult.Acknowledged(matchedCount, modifiedCount, null));
+            //}
+            //else if (typeof(T) == typeof(RiqsAbsencePlan))
+            //{
+            //    _mockAbsencePlanCollection
+            //        .Setup(c => c.UpdateOneAsync(
+            //            It.IsAny<FilterDefinition<RiqsAbsencePlan>>(),
+            //            It.IsAny<UpdateDefinition<RiqsAbsencePlan>>(),
+            //            It.IsAny<UpdateOptions>(),
+            //            default))
+            //        .ReturnsAsync(new UpdateResult.Acknowledged(matchedCount, modifiedCount, null));
+            //}
 
             return this;
         }
@@ -213,50 +212,50 @@ namespace XUnitTests.DomainServiceTests
         // Method to configure UpdateManyAsync to return custom update result
         public MockEcapMongoDbDataContextProvider SetupUpdateManyAsync<T>(long matchedCount, long modifiedCount) where T : class
         {
-            if (typeof(T) == typeof(RiqsAbsenceType))
-            {
-                _mockAbsenceTypeCollection
-                    .Setup(c => c.UpdateManyAsync(
-                        It.IsAny<FilterDefinition<RiqsAbsenceType>>(),
-                        It.IsAny<UpdateDefinition<RiqsAbsenceType>>(),
-                        It.IsAny<UpdateOptions>(),
-                        default))
-                    .ReturnsAsync(new UpdateResult.Acknowledged(matchedCount, modifiedCount, null));
-            }
-            else if (typeof(T) == typeof(RiqsAbsencePlan))
-            {
-                _mockAbsencePlanCollection
-                    .Setup(c => c.UpdateManyAsync(
-                        It.IsAny<FilterDefinition<RiqsAbsencePlan>>(),
-                        It.IsAny<UpdateDefinition<RiqsAbsencePlan>>(),
-                        It.IsAny<UpdateOptions>(),
-                        default))
-                    .ReturnsAsync(new UpdateResult.Acknowledged(matchedCount, modifiedCount, null));
-            }
+            //if (typeof(T) == typeof(RiqsAbsenceType))
+            //{
+            //    _mockAbsenceTypeCollection
+            //        .Setup(c => c.UpdateManyAsync(
+            //            It.IsAny<FilterDefinition<RiqsAbsenceType>>(),
+            //            It.IsAny<UpdateDefinition<RiqsAbsenceType>>(),
+            //            It.IsAny<UpdateOptions>(),
+            //            default))
+            //        .ReturnsAsync(new UpdateResult.Acknowledged(matchedCount, modifiedCount, null));
+            //}
+            //else if (typeof(T) == typeof(RiqsAbsencePlan))
+            //{
+            //    _mockAbsencePlanCollection
+            //        .Setup(c => c.UpdateManyAsync(
+            //            It.IsAny<FilterDefinition<RiqsAbsencePlan>>(),
+            //            It.IsAny<UpdateDefinition<RiqsAbsencePlan>>(),
+            //            It.IsAny<UpdateOptions>(),
+            //            default))
+            //        .ReturnsAsync(new UpdateResult.Acknowledged(matchedCount, modifiedCount, null));
+            //}
 
             return this;
         }
 
         public MockEcapMongoDbDataContextProvider SetupCountDocumentsAsync<T>(long count) where T : class
         {
-            if (typeof(T) == typeof(RiqsAbsenceType))
-            {
-                _mockAbsenceTypeCollection
-                    .Setup(c => c.CountDocumentsAsync(
-                        It.IsAny<FilterDefinition<RiqsAbsenceType>>(),
-                        It.IsAny<CountOptions>(),
-                        default))
-                    .ReturnsAsync(count);
-            }
-            else if (typeof(T) == typeof(RiqsAbsencePlan))
-            {
-                _mockAbsencePlanCollection
-                    .Setup(c => c.CountDocumentsAsync(
-                        It.IsAny<FilterDefinition<RiqsAbsencePlan>>(),
-                        It.IsAny<CountOptions>(),
-                        default))
-                    .ReturnsAsync(count);
-            }
+            //if (typeof(T) == typeof(RiqsAbsenceType))
+            //{
+            //    _mockAbsenceTypeCollection
+            //        .Setup(c => c.CountDocumentsAsync(
+            //            It.IsAny<FilterDefinition<RiqsAbsenceType>>(),
+            //            It.IsAny<CountOptions>(),
+            //            default))
+            //        .ReturnsAsync(count);
+            //}
+            //else if (typeof(T) == typeof(RiqsAbsencePlan))
+            //{
+            //    _mockAbsencePlanCollection
+            //        .Setup(c => c.CountDocumentsAsync(
+            //            It.IsAny<FilterDefinition<RiqsAbsencePlan>>(),
+            //            It.IsAny<CountOptions>(),
+            //            default))
+            //        .ReturnsAsync(count);
+            //}
 
             return this;
         }
@@ -276,18 +275,18 @@ namespace XUnitTests.DomainServiceTests
             mockFindFluent.Setup(f => f.ToCursorAsync(default)).ReturnsAsync(mockCursor.Object);
             mockFindFluent.Setup(f => f.ToListAsync(default)).ReturnsAsync(results);
 
-            if (typeof(T) == typeof(RiqsAbsenceType))
-            {
-                _mockAbsenceTypeCollection
-                    .Setup(c => c.Find(It.IsAny<FilterDefinition<RiqsAbsenceType>>(), null))
-                    .Returns((mockFindFluent.Object as IFindFluent<RiqsAbsenceType, RiqsAbsenceType>)!);
-            }
-            else if (typeof(T) == typeof(RiqsAbsencePlan))
-            {
-                _mockAbsencePlanCollection
-                    .Setup(c => c.Find(It.IsAny<FilterDefinition<RiqsAbsencePlan>>(), null))
-                    .Returns((mockFindFluent.Object as IFindFluent<RiqsAbsencePlan, RiqsAbsencePlan>)!);
-            }
+            //if (typeof(T) == typeof(RiqsAbsenceType))
+            //{
+            //    _mockAbsenceTypeCollection
+            //        .Setup(c => c.Find(It.IsAny<FilterDefinition<RiqsAbsenceType>>(), null))
+            //        .Returns((mockFindFluent.Object as IFindFluent<RiqsAbsenceType, RiqsAbsenceType>)!);
+            //}
+            //else if (typeof(T) == typeof(RiqsAbsencePlan))
+            //{
+            //    _mockAbsencePlanCollection
+            //        .Setup(c => c.Find(It.IsAny<FilterDefinition<RiqsAbsencePlan>>(), null))
+            //        .Returns((mockFindFluent.Object as IFindFluent<RiqsAbsencePlan, RiqsAbsencePlan>)!);
+            //}
 
             return this;
         }
@@ -355,18 +354,18 @@ namespace XUnitTests.DomainServiceTests
             mockFindFluent.Setup(f => f.Project(It.IsAny<ProjectionDefinition<TSource, TProjection>>()))
                           .Returns(mockProjectionFluent.Object);
 
-            if (typeof(TSource) == typeof(RiqsAbsenceType))
-            {
-                _mockAbsenceTypeCollection
-                    .Setup(c => c.Find(It.IsAny<FilterDefinition<RiqsAbsenceType>>(), null))
-                    .Returns((mockFindFluent.Object as IFindFluent<RiqsAbsenceType, RiqsAbsenceType>)!);
-            }
-            else if (typeof(TSource) == typeof(RiqsAbsencePlan))
-            {
-                _mockAbsencePlanCollection
-                    .Setup(c => c.Find(It.IsAny<FilterDefinition<RiqsAbsencePlan>>(), null))
-                    .Returns((mockFindFluent.Object as IFindFluent<RiqsAbsencePlan, RiqsAbsencePlan>)!);
-            }
+            //if (typeof(TSource) == typeof(RiqsAbsenceType))
+            //{
+            //    _mockAbsenceTypeCollection
+            //        .Setup(c => c.Find(It.IsAny<FilterDefinition<RiqsAbsenceType>>(), null))
+            //        .Returns((mockFindFluent.Object as IFindFluent<RiqsAbsenceType, RiqsAbsenceType>)!);
+            //}
+            //else if (typeof(TSource) == typeof(RiqsAbsencePlan))
+            //{
+            //    _mockAbsencePlanCollection
+            //        .Setup(c => c.Find(It.IsAny<FilterDefinition<RiqsAbsencePlan>>(), null))
+            //        .Returns((mockFindFluent.Object as IFindFluent<RiqsAbsencePlan, RiqsAbsencePlan>)!);
+            //}
 
             return this;
         }

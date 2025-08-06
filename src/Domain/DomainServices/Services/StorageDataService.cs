@@ -159,52 +159,6 @@ namespace Selise.Ecap.SC.PraxisMonitor.Domain.DomainServices.Services
             return code is HttpStatusCode.OK or HttpStatusCode.Created;
         }
 
-        public async Task<bool> RenameFileInCloud(string sourceFileId, string newFileName)
-        {
-            if (string.IsNullOrWhiteSpace(sourceFileId) || string.IsNullOrWhiteSpace(newFileName))
-                return false;
-
-            var moveFileCommand = new MoveFileCommand
-            {
-                SourceFileId = sourceFileId,
-                TargetFileName = newFileName
-            };
-
-            CommandResponse response;
-
-            try
-            {
-                response = await _serviceClient.SendToHttpAsync<CommandResponse>(
-                                HttpMethod.Post,
-                                _storageServiceBaseUrl,
-                                _storageVersion,
-                                _moveFilePath,
-                                moveFileCommand,
-                                await GetAdminToken());
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Exception occurred during renaming file with payload: {Payload}. Exception Message: {ErrorMessage}. Exception Details: {StackTrace}.",
-                    JsonConvert.SerializeObject(moveFileCommand), ex.Message, ex.StackTrace);
-
-                return false;
-            }
-
-            if (
-                (response.HttpStatusCode.Equals(HttpStatusCode.OK) || response.HttpStatusCode.Equals(HttpStatusCode.Accepted)) &&
-                response.StatusCode.Equals(0) && !response.ErrorMessages.Any())
-            {
-                _logger.LogInformation("File={FileName}, FileId={FileId} renamed successfully in cloud.", newFileName, sourceFileId);
-                return true;
-            }
-            else
-            {
-                _logger.LogError("Failed to rename file in cloud. File={FileName}, FileId={FileId}. Reason={Reason}.", newFileName, sourceFileId, response.ExternalError);
-                return false;
-            }
-
-        }
-
         public async Task<GetPreSignedUrlForUploadResponse> GetPreSignedUrlForUploadQueryModel(PreSignedUrlForUploadQueryModel preSignedUrlForUploadQueryModel,
             string accessToken)
         {

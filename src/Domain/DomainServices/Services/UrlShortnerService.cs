@@ -2,7 +2,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
 using Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices;
-using Selise.Ecap.SC.PraxisMonitor.Domain.DomainServices.TwoFactorAuthentication;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -11,7 +10,7 @@ namespace Selise.Ecap.SC.PraxisMonitor.Domain.DomainServices
 {
     public class UrlShortnerService : IUrlShortnerService
     {
-        private readonly ILogger<TwoFactorAuthenticationService> _logger;
+        private readonly ILogger<UrlShortnerService> _logger;
         private readonly IServiceClient _serviceClient;
         private readonly ISecurityContextProvider _securityContextProvider;
         private readonly string _urlShortnerBaseUrl;
@@ -20,7 +19,7 @@ namespace Selise.Ecap.SC.PraxisMonitor.Domain.DomainServices
 
         public UrlShortnerService(
             IServiceClient serviceClient,
-            ILogger<TwoFactorAuthenticationService> logger,
+            ILogger<UrlShortnerService> logger,
             IConfiguration configuration,
             ISecurityContextProvider securityContextProvider
         )

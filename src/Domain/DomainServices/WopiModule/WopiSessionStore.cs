@@ -1,5 +1,6 @@
 using Selise.Ecap.SC.WopiMonitor.Contracts.Models.WopiModule;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace Selise.Ecap.SC.WopiMonitor.Domain.DomainServices.WopiModule
 {

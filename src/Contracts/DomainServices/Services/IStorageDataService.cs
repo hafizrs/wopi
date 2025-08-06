@@ -21,7 +21,6 @@ namespace Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices
             PreSignedUrlForUploadQueryModel preSignedUrlForUploadQueryModel, bool useImpersonation = false);
         bool UploadFileToStorageByUrl(string uploadUrl, byte[] byteArray);
         Task<bool> UploadFileToStorageByUrlAsync(string uploadUrl, byte[] bytes, CancellationToken token = default);
-        Task<bool> RenameFileInCloud(string sourceFileId, string newFileName);
         Task<GetPreSignedUrlForUploadResponse> GetPreSignedUrlForUploadQueryModel(
             PreSignedUrlForUploadQueryModel preSignedUrlForUploadQueryModel, string accessToken);
         Task<bool> UploadFileAsync(string accessToken, string fileId, string fileName, byte[] byteArray, string[] tags = null,

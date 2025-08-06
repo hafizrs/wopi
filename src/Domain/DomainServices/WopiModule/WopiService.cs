@@ -22,20 +22,20 @@ namespace Selise.Ecap.SC.WopiMonitor.Domain.DomainServices.WopiModule
         private readonly ILogger<WopiService> _logger;
         private readonly IRepository _repository;
         private readonly ISecurityContextProvider _securityContextProvider;
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IServiceClient _serviceClient;
         private readonly string _localFilePath;
         private readonly string _collaboraBaseUrl;
 
         public WopiService(
             IRepository repository,
             ISecurityContextProvider securityContextProvider,
-            IHttpClientFactory httpClientFactory,
+            IServiceClient serviceClient,
             IConfiguration configuration,
             ILogger<WopiService> logger)
         {
             _repository = repository;
             _securityContextProvider = securityContextProvider;
-            _httpClientFactory = httpClientFactory;
+            _serviceClient = serviceClient;
             _logger = logger;
             _localFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp_files");
             _collaboraBaseUrl = configuration["CollaboraBaseUrl"] ?? "https://colabora.rashed.app";
@@ -99,22 +99,6 @@ namespace Selise.Ecap.SC.WopiMonitor.Domain.DomainServices.WopiModule
                 AccessToken = session.AccessToken,
                 Message = "Session created successfully"
             };
-        }
-
-        public async Task DeleteWopiSession(DeleteWopiSessionCommand command)
-        {
-            var session = _repository.GetItem<WopiSession>(s => s.SessionId == command.SessionId);
-            if (session != null)
-            {
-                // Delete local file if exists
-                if (File.Exists(session.LocalFilePath))
-                {
-                    File.Delete(session.LocalFilePath);
-                }
-
-                await _repository.DeleteAsync<WopiSession>(s => s.SessionId == command.SessionId);
-                _logger.LogInformation("Deleted WOPI session {SessionId}", command.SessionId);
-            }
         }
 
         public async Task<WopiFileInfo> GetWopiFileInfo(GetWopiFileInfoQuery query)
@@ -266,8 +250,13 @@ namespace Selise.Ecap.SC.WopiMonitor.Domain.DomainServices.WopiModule
             {
                 try
                 {
-                    using var httpClient = _httpClientFactory.CreateClient();
-                    var response = await httpClient.GetAsync(session.FileUrl);
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri(session.FileUrl)
+                    };
+                    
+                    var response = await _serviceClient.SendToHttpAsync(request);
                     response.EnsureSuccessStatusCode();
                     
                     var fileContent = await response.Content.ReadAsByteArrayAsync();
@@ -294,18 +283,24 @@ namespace Selise.Ecap.SC.WopiMonitor.Domain.DomainServices.WopiModule
 
             try
             {
-                using var httpClient = _httpClientFactory.CreateClient();
                 var uploadHeaders = JsonConvert.DeserializeObject<Dictionary<string, string>>(session.UploadHeaders ?? "{}");
                 
                 using var content = new ByteArrayContent(fileBuffer);
                 content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
                 
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(session.UploadUrl),
+                    Content = content
+                };
+                
                 foreach (var header in uploadHeaders)
                 {
-                    content.Headers.Add(header.Key, header.Value);
+                    request.Headers.Add(header.Key, header.Value);
                 }
 
-                var response = await httpClient.PostAsync(session.UploadUrl, content);
+                var response = await _serviceClient.SendToHttpAsync(request);
                 response.EnsureSuccessStatusCode();
 
                 var result = await response.Content.ReadAsStringAsync();

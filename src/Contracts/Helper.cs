@@ -18,28 +18,7 @@ public static class Helper
     {
         return new List<Type>
             {
-                typeof(User),
-                typeof(Person),
-                typeof(Client),
-                typeof(File),
-                typeof(PlatformDictionary),
-                typeof(Connection),
-                typeof(DisconnectedConnection),
-                typeof(GdprContent),
-                typeof(PraxisClient),
-                typeof(PraxisUser),
-                typeof(PraxisClientCategory),
-                typeof(PraxisForm),
-                typeof(PraxisTaskConfig),
-                typeof(PraxisTask),
-                typeof(TaskSummary),
-                typeof(TaskSchedule),
-                typeof(PraxisRisk),
-                typeof(PraxisAssessment),
-                typeof(PraxisOpenItem),
-                typeof(PraxisOpenItemConfig),
-                typeof(PraxisEquipment),
-                typeof(PraxisEquipmentMaintenance),
+                
             };
     }
 }

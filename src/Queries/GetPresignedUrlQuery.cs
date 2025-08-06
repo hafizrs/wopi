@@ -12,3 +12,4 @@ namespace Selise.Ecap.SC.PraxisMonitor.Queries
         public string FileName { get; set; }
     }
 }
+

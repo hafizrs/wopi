@@ -4,6 +4,7 @@ using Selise.Ecap.SC.WopiMonitor.Contracts.DomainServices.WopiModule;
 using Selise.Ecap.SC.WopiMonitor.Contracts.EntityResponse;
 using Selise.Ecap.SC.WopiMonitor.Contracts.Models;
 using System.Threading.Tasks;
+using Selise.Ecap.SC.PraxisMonitor.Contracts.Models;
 
 namespace Selise.Ecap.SC.WopiMonitor.QueryHandlers.WopiModule
 {

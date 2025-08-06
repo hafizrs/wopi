@@ -1,17 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Selise.Ecap.Entities.PrimaryEntities.StorageService;
-using Selise.Ecap.SC.PraxisMonitor.Contracts;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.Dms;
 using Selise.Ecap.SC.PraxisMonitor.Contracts.DomainServices;
 using Selise.Ecap.SC.PraxisMonitor.Contracts.Models;
-using Selise.Ecap.SC.PraxisMonitor.Contracts.ResponseModels.LibraryModule;
-using Selise.Ecap.SC.PraxisMonitor.Utils;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
 using SeliseBlocks.Genesis.Framework.PDS.Entity;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -164,76 +159,9 @@ namespace Selise.Ecap.SC.PraxisMonitor.Domain.DomainServices.Services
             }
         }
 
-        public async Task<CreateDocumentEditUrlResponse> CreateDocumentEditUrl(CreateDocumentEditUrlPayload payload)
-        {
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri("https://colabora.rashed.app/wopi/create-session"),
-            };
-            request.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8,
-                "application/json");
-            HttpResponseMessage httpAsync = await _serviceClient.SendToHttpAsync(request);
-            return httpAsync.IsSuccessStatusCode
-                ? httpAsync.Content.ReadAsAsync<CreateDocumentEditUrlResponse>().Result
-                : null;
-        }
-
         public async Task<bool> DeleteFilesFromStorage(List<string> fileIds)
         {
             return await DeleteFilesFromStorage(fileIds, null);
-        }
-
-        public List<PraxisParentInfo> GetFileParentEntities(File file)
-        {
-            return GetParentEntitysFromMetaData(file);
-        }
-
-        private List<PraxisParentInfo> GetParentEntitysFromMetaData(File sourceFile)
-        {
-            List<PraxisParentInfo> parentEntities = new List<PraxisParentInfo>()
-            {
-                new PraxisParentInfo()
-                {
-                    EntityId = sourceFile.MetaData["EntityId"].Value,
-                    EntityName = sourceFile.MetaData["EntityName"].Value
-                }
-            };
-
-            return parentEntities;
-        }
-
-        public List<File> GetConvertedFiles(string fileId)
-        {
-            List<File> convertedFiles = new List<File>();
-            var connections = repository.GetItems<Connection>(c =>
-                c.ParentEntityID == fileId && c.Tags.Contains(PraxisTag.ResizeImage_1024_1024)).ToList();
-
-            foreach (var connection in connections)
-            {
-                convertedFiles.Add(new File()
-                {
-                    ItemId = connection.ChildEntityID,
-                    Tags = connection.Tags,
-                    TenantId = connection.TenantId,
-                    RolesAllowedToRead = connection.RolesAllowedToRead,
-                    RolesAllowedToDelete = connection.RolesAllowedToDelete,
-                    RolesAllowedToUpdate = connection.RolesAllowedToUpdate,
-                    RolesAllowedToWrite = connection.RolesAllowedToWrite,
-                    Language = connection.Language,
-                    CreateDate = connection.CreateDate,
-                    CreatedBy = connection.CreatedBy,
-                    LastUpdatedBy = connection.LastUpdatedBy,
-                    LastUpdateDate = connection.LastUpdateDate
-                });
-            }
-
-            return convertedFiles;
-        }
-
-        public void UpdateStorageBaseUrl(string _baseUrl)
-        {
-            _storageServiceBaseUrl = _baseUrl;
         }
     }
 }

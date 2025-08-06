@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Selise.Ecap.SC.WopiMonitor.Contracts.Commands;
+using Selise.Ecap.SC.PraxisMonitor.Contracts.Models;
 using Selise.Ecap.SC.WopiMonitor.Contracts.Commands.WopiModule;
-using Selise.Ecap.SC.WopiMonitor.Contracts.Constants;
-using Selise.Ecap.SC.WopiMonitor.Contracts.Models;
+using Selise.Ecap.SC.WopiMonitor.Contracts.EntityResponse;
 using Selise.Ecap.SC.WopiMonitor.Contracts.Queries.WopiModule;
-using Selise.Ecap.SC.WopiMonitor.Queries;
-using Selise.Ecap.SC.WopiMonitor.ValidationHandlers;
+using SeliseBlocks.Genesis.Framework;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
 using System.Threading.Tasks;
 
@@ -37,18 +35,18 @@ namespace Selise.Ecap.SC.WopiMonitor.WebService
 
         [HttpPost]
         [Authorize]
-        public async Task<CommandResponse> CreateSession([FromBody] CreateWopiSessionCommand command)
+        public async Task<CreateWopiSessionResponse> CreateSession([FromBody] CreateWopiSessionCommand command)
         {
-            if (command == null) return ErrorResponse();
+            if (command == null) return null;
 
             var result = await _validationHandler.SubmitAsync<CreateWopiSessionCommand, CommandResponse>(command);
 
             if (result.StatusCode.Equals(0))
             {
-                return await _commandService.SubmitAsync<CreateWopiSessionCommand, CommandResponse>(command);
+                return await _commandService.SubmitAsync<CreateWopiSessionCommand, CreateWopiSessionResponse>(command);
             }
 
-            return result;
+            return null;
         }
 
         [HttpPost]
@@ -108,10 +106,10 @@ namespace Selise.Ecap.SC.WopiMonitor.WebService
         public async Task<CommandResponse> Lock([FromBody] LockWopiFileCommand command)
         {
             if (command == null) return ErrorResponse();
-            
+
             // Set the WopiOverride from header
             command.WopiOverride = Request.Headers["x-wopi-override"].ToString();
-            
+
             return await _commandService.SubmitAsync<LockWopiFileCommand, CommandResponse>(command);
         }
 
@@ -132,4 +130,4 @@ namespace Selise.Ecap.SC.WopiMonitor.WebService
             return response;
         }
     }
-} 
+}

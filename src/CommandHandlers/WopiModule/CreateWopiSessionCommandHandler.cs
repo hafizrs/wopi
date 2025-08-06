@@ -1,14 +1,15 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using SeliseBlocks.Genesis.Framework.Infrastructure;
 using Selise.Ecap.SC.WopiMonitor.Contracts.Commands.WopiModule;
 using Selise.Ecap.SC.WopiMonitor.Contracts.DomainServices.WopiModule;
+using Selise.Ecap.SC.WopiMonitor.Contracts.EntityResponse;
+using SeliseBlocks.Genesis.Framework.Infrastructure;
 using System;
 using System.Threading.Tasks;
 
 namespace Selise.Ecap.SC.WopiMonitor.CommandHandlers.WopiModule
 {
-    public class CreateWopiSessionCommandHandler : ICommandHandler<CreateWopiSessionCommand, CommandResponse>
+    public class CreateWopiSessionCommandHandler : ICommandHandler<CreateWopiSessionCommand, CreateWopiSessionResponse>
     {
         private readonly IWopiService _service;
         private readonly ILogger<CreateWopiSessionCommandHandler> _logger;
@@ -19,12 +20,12 @@ namespace Selise.Ecap.SC.WopiMonitor.CommandHandlers.WopiModule
             _logger = logger;
         }
         
-        public CommandResponse Handle(CreateWopiSessionCommand command)
+        public CreateWopiSessionResponse Handle(CreateWopiSessionCommand command)
         {
             throw new NotImplementedException();
         }
         
-        public async Task<CommandResponse> HandleAsync(CreateWopiSessionCommand command)
+        public async Task<CreateWopiSessionResponse> HandleAsync(CreateWopiSessionCommand command)
         {
             var response = new CommandResponse();
             _logger.LogInformation("Enter {HandlerName} with payload:{Payload}.", nameof(CreateWopiSessionCommandHandler), JsonConvert.SerializeObject(command));
@@ -32,7 +33,7 @@ namespace Selise.Ecap.SC.WopiMonitor.CommandHandlers.WopiModule
             try
             {
                 var result = await _service.CreateWopiSession(command);
-                response.Data = result;
+                return result;
             }
             catch (Exception ex)
             {
@@ -42,7 +43,7 @@ namespace Selise.Ecap.SC.WopiMonitor.CommandHandlers.WopiModule
             }
             
             _logger.LogInformation("Handled By {HandlerName} with payload:{Payload}.", nameof(CreateWopiSessionCommandHandler), JsonConvert.SerializeObject(command));
-            return response;
+            return null;
         }
     }
 } 
