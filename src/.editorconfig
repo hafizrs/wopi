@@ -1,4 +1,0 @@
-﻿[*.cs]
-
-# S3887: Mutable, non-private fields should not be "readonly"
-dotnet_diagnostic.S3887.severity = none

@@ -1,129 +1,50 @@
-# L3-NETCORE-GENERIC-WOPI
+## Getting Started
 
-A .NET Core WOPI (Web Application Open Platform Interface) server implementation for Collabora Online integration.
+To get started with the l0-net-blocks-template, follow these steps:
 
-## Overview
-
-This project provides a complete WOPI server implementation that allows integration with Collabora Online for document editing. It follows Clean Architecture, CQRS, and DDD patterns.
-
-## Architecture
-
-The project follows the established patterns from the PraxisMonitor project:
-
-- **Clean Architecture**: Separation of concerns with clear layer boundaries
-- **CQRS**: Command Query Responsibility Segregation
-- **DDD**: Domain-Driven Design with rich domain models
-- **Repository Pattern**: Data access abstraction
-- **Command/Query Handler Pattern**: Business logic organization
-- **Validation Pattern**: FluentValidation for input validation
-- **Event-Driven Architecture**: For extensibility
-
-## Project Structure
-
-```
-src/
-├── WebService/                 # API Layer
-│   ├── WopiController.cs      # WOPI endpoints
-│   ├── Program.cs             # Application startup
-│   └── ServiceCollectionExtensions.cs
-├── Domain/                    # Domain Layer
-│   └── DomainServices/
-│       └── WopiModule/
-│           ├── WopiService.cs
-│           └── WopiPermissionService.cs
-├── Contracts/                 # Contracts Layer
-│   ├── Commands/WopiModule/
-│   ├── Queries/WopiModule/
-│   ├── Models/WopiModule/
-│   ├── DomainServices/WopiModule/
-│   ├── EntityResponse/
-│   └── Constants/
-├── CommandHandlers/           # Command Handlers
-│   └── WopiModule/
-├── QueryHandlers/             # Query Handlers
-│   └── WopiModule/
-├── Validators/                # Validation
-├── ValidationHandlers/        # Validation Handlers
-└── Utils/                     # Utilities
-```
+1. Clone the repository: `git clone https://github.com/your-username/l0-net-blocks-template.git`
+2. Navigate to the project directory: `cd l0-net-blocks-template`
+3. Install the required dependencies: `dotnet restore`
+4. Build the project: `dotnet build`
+5. Run the project: `dotnet run`
 
 ## Features
 
-### WOPI Protocol Support
-- **CheckFileInfo**: File metadata endpoint
-- **GetFile**: File content download
-- **PutFile**: File content upload
-- **Lock/Unlock**: File locking operations
+- Modular architecture for building microservices
+- Scalable design for handling high traffic
+- Easy integration with other services
+- Customizable configuration options
 
-### Session Management
-- Create WOPI editing sessions
-- Manage session lifecycle
-- File download/upload handling
-- Permission-based access control
+## Usage
 
-### Security
-- JWT Bearer authentication
-- Role-based permissions
-- Department-level access control
-- Session validation
+To use the l0-net-blocks-template in your own project, follow these steps:
 
-## API Endpoints
+1. Copy the contents of the `l0-net-blocks-template` directory to your project directory.
+2. Choose between an API or worker service, or both, based on your requirements.
+3. Modify the code and configuration files to fit your specific requirements.
 
-### Internal API (Authenticated)
-- `POST /api/wopi/create-session` - Create WOPI session
-- `POST /api/wopi/delete-session` - Delete WOPI session
-- `POST /api/wopi/sessions` - Get sessions for department
-- `POST /api/wopi/session` - Get specific session
+### API Service
 
-### WOPI Protocol Endpoints (Anonymous)
-- `GET /api/wopi/files/{sessionId}/contents` - Get file content
-- `GET /api/wopi/files/{sessionId}` - Get file info
-- `POST /api/wopi/files/{sessionId}/contents` - Update file content
+If you need an API service:
 
-## Configuration
+- Create a new project for your API service.
 
-The application uses the following configuration:
+- Implement the necessary endpoints and logic.
+- Build and run your API service using the instructions provided in the "Getting Started" section.
 
-```json
-{
-  "CollaboraBaseUrl": "https://colabora.rashed.app",
-  "ServiceName": "WopiMonitor",
-  "BlocksAuditLogQueueName": "wopi-audit-log"
-}
-```
+### Worker Service
+If you need a worker service:
+- Create a new project for your worker service.
+- Implement the necessary background tasks and logic.
+- Build and run your worker service using the instructions provided in the "Getting Started" section.
 
-## Dependencies
+### Both API and Worker Service
+If you need both an API and a worker service:
+- Create separate projects for your API and worker services.
+- Implement the necessary endpoints, logic, and background tasks.
+- Build and run both services using the instructions provided in the "Getting Started" section.
 
-- .NET 6.0
-- ASP.NET Core
-- SeliseBlocks.Genesis.Framework
-- FluentValidation
-- Newtonsoft.Json
-- Microsoft.Extensions.Http
-
-## Getting Started
-
-1. Clone the repository
-2. Restore NuGet packages
-3. Configure the application settings
-4. Run the application
-
-```bash
-dotnet restore
-dotnet build
-dotnet run --project src/WebService
-```
-
-## Development
-
-The project follows the established patterns from the PraxisMonitor project:
-
-- All new features should follow CQRS pattern
-- Use FluentValidation for input validation
-- Implement proper logging and error handling
-- Follow the existing naming conventions
-- Add unit tests for new functionality
-
+## Contributing
+Contributions are welcome! If you have any ideas, suggestions, or bug reports, please open an issue or submit a pull request.
 ## License
-
-This project is part of the Selise ECAP platform. 
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
