@@ -1,13 +1,17 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
+using Selise.Ecap.Entities.PrimaryEntities.IDM;
+using Selise.Ecap.SC.Wopi.Contracts.DomainServices.WopiModule;
 using Selise.Ecap.SC.Wopi.Contracts.Infrastructure;
+using Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule;
 using Selise.Ecap.SC.Wopi.ValidationHandlers;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace Selise.Ecap.SC.Wopi.WebService
@@ -36,6 +40,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
             // Add services to the container
             builder.Services.AddControllers();
             builder.Services.AddHttpClient();
+            AddApplicationServices(builder.Services);
 
             // Configure CORS for WOPI
             builder.Services.AddCors(options =>
@@ -50,7 +55,6 @@ namespace Selise.Ecap.SC.Wopi.WebService
             });
 
             var app = builder.Build();
-
             // Configure the HTTP request pipeline
             if (app.Environment.IsDevelopment())
             {
@@ -102,7 +106,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
             return new[] { appSettings.BlocksAuditLogQueueName };
         }
 
-        private static void AddApplicationServices(IServiceCollection container, IAppSettings appSettings)
+        private static void AddApplicationServices(IServiceCollection container)
         {
 
 
@@ -113,7 +117,6 @@ namespace Selise.Ecap.SC.Wopi.WebService
             #region Validator
             container.AddCommandValidator();
             #endregion
-
             #region Wopi Business
             container.AddWopiBusinessServices();
             #endregion

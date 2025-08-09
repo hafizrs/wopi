@@ -1,4 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Selise.Ecap.SC.Wopi.Contracts.DomainServices.WopiModule;
+using Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule;
+using SeliseBlocks.Genesis.Framework.Infrastructure;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -7,6 +10,7 @@ public static class WopiBusinessServiceCollectionExtensions
 {
     public static void AddWopiBusinessServices(this IServiceCollection services)
     {
+        services.AddSingleton<IWopiService, WopiService>();
     }
 
     public static void RegisterAllDerivedTypes<T>(

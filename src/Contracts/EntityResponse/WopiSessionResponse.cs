@@ -4,12 +4,11 @@ using SeliseBlocks.Genesis.Framework.PDS.Entity;
 
 namespace Selise.Ecap.SC.Wopi.Contracts.EntityResponse
 {
-    public class WopiSessionResponse : EntityBase
+    public class WopiSessionResponse
     {
         public WopiSessionResponse() { }
         public WopiSessionResponse(WopiSession session)
         {
-            ItemId = session.ItemId;
             SessionId = session.SessionId;
             FileUrl = session.FileUrl;
             UploadUrl = session.UploadUrl;

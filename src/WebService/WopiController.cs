@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Selise.Ecap.SC.Wopi.Contracts.Models;
 using Selise.Ecap.SC.Wopi.Contracts.Commands.WopiModule;
+using Selise.Ecap.SC.Wopi.Contracts.DomainServices.WopiModule;
 using Selise.Ecap.SC.Wopi.Contracts.EntityResponse;
+using Selise.Ecap.SC.Wopi.Contracts.Models;
 using Selise.Ecap.SC.Wopi.Contracts.Queries.WopiModule;
-using SeliseBlocks.Genesis.Framework;
+using Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
 using System;
 using System.IO;
@@ -18,24 +19,15 @@ namespace Selise.Ecap.SC.Wopi.WebService
     [ApiController]
     public class WopiController : ControllerBase
     {
-        private readonly CommandHandler _commandService;
-        private readonly ValidationHandler _validationHandler;
-        private readonly QueryHandler _queryHandler;
-        private readonly IServiceClient _serviceClient;
         private readonly ILogger<WopiController> _logger;
+        private readonly IWopiService _service;
 
         public WopiController(
-            CommandHandler commandService,
-            ValidationHandler validationHandler,
-            QueryHandler queryHandler,
-            IServiceClient serviceClient,
+            IWopiService service,
             ILogger<WopiController> logger)
         {
-            _commandService = commandService;
-            _validationHandler = validationHandler;
-            _queryHandler = queryHandler;
-            _serviceClient = serviceClient;
             _logger = logger;
+            _service = service;
         }
 
         // Session Management Endpoints (like JavaScript implementation)
@@ -45,14 +37,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
         {
             if (command == null) return null;
 
-            var result = await _validationHandler.SubmitAsync<CreateWopiSessionCommand, CommandResponse>(command);
-
-            if (result.StatusCode.Equals(0))
-            {
-                return await _commandService.SubmitAsync<CreateWopiSessionCommand, CreateWopiSessionResponse>(command);
-            }
-
-            return null;
+            return await _service.CreateWopiSession(command);
         }
 
         [HttpGet("sessions")]
@@ -60,23 +45,25 @@ namespace Selise.Ecap.SC.Wopi.WebService
         public QueryHandlerResponse GetAllSessions()
         {
             var query = new GetWopiSessionsQuery();
-            return _queryHandler.Submit<GetWopiSessionsQuery, QueryHandlerResponse>(query);
+            return new QueryHandlerResponse() {
+                Data = _service.GetWopiSessions(query)
+            };
         }
 
         [HttpGet("session/{sessionId}")]
         [AllowAnonymous]
-        public QueryHandlerResponse GetSessionInfo(string sessionId)
+        public WopiSessionResponse GetSessionInfo(string sessionId)
         {
             var query = new GetWopiSessionQuery { SessionId = sessionId };
-            return _queryHandler.Submit<GetWopiSessionQuery, QueryHandlerResponse>(query);
+            return _service.GetWopiSession(query);
         }
 
         [HttpDelete("session/{sessionId}")]
         [AllowAnonymous]
-        public async Task<CommandResponse> CleanupSession(string sessionId)
+        public async Task CleanupSession(string sessionId)
         {
             var command = new DeleteWopiSessionCommand { SessionId = sessionId };
-            return await _commandService.SubmitAsync<DeleteWopiSessionCommand, CommandResponse>(command);
+            await _service.DeleteWopiSession(command);
         }
 
         // WOPI Protocol Endpoints (following standard WOPI specification)
@@ -96,16 +83,9 @@ namespace Selise.Ecap.SC.Wopi.WebService
                     AccessToken = accessToken
                 };
 
-                var result = _queryHandler.Submit<GetWopiFileInfoQuery, QueryHandlerResponse>(query);
+                var result = await _service.GetWopiFileInfo(query);
                 
-                if (result.StatusCode == 0)
-                {
-                    return Ok(result.Data);
-                }
-                else
-                {
-                    return StatusCode(500, result.ErrorMessage);
-                }
+                return Ok(result);
             }
             catch (UnauthorizedAccessException)
             {
@@ -138,15 +118,15 @@ namespace Selise.Ecap.SC.Wopi.WebService
                     AccessToken = accessToken
                 };
 
-                var result = _queryHandler.Submit<GetWopiFileContentQuery, QueryHandlerResponse>(query);
+                var result = await _service.GetWopiFileContent(query);
                 
-                if (result.StatusCode == 0 && result.Data is byte[] fileContent)
+                if (result != null)
                 {
-                    return File(fileContent, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+                    return File(result, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
                 }
                 else
                 {
-                    return StatusCode(500, result.ErrorMessage);
+                    return StatusCode(500);
                 }
             }
             catch (UnauthorizedAccessException)
@@ -186,17 +166,11 @@ namespace Selise.Ecap.SC.Wopi.WebService
                     FileContent = fileContent
                 };
 
-                var result = await _commandService.SubmitAsync<UpdateWopiFileCommand, CommandResponse>(command);
+                var result = await _service.UpdateWopiFile(command); ;
                 
-                if (result.StatusCode == 0)
+                if (result != null)
                 {
-                    return Ok(new 
-                    {
-                        LastModifiedTime = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
-                        Name = "Document.docx",
-                        Size = fileContent.Length,
-                        Version = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString()
-                    });
+                    return Ok(result);
                 }
                 else
                 {
@@ -241,13 +215,13 @@ namespace Selise.Ecap.SC.Wopi.WebService
                     WopiOverride = wopiOverride
                 };
 
-                var result = await _commandService.SubmitAsync<LockWopiFileCommand, CommandResponse>(command);
+                var result = await _service.LockWopiFile(command);
                 
-                if (result.StatusCode == 0)
+                if (result.fileStream != null)
                 {
                     return Ok(new 
                     {
-                        Name = "Document.docx",
+                        Name = result.fileName,
                         Version = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString()
                     });
                 }
