@@ -43,5 +43,6 @@
 
     <ItemGroup>
         <Folder Include="DomainServices\InvoiceGenerator" />
+        <Folder Include="Repositories\" />
     </ItemGroup>
 </Project>

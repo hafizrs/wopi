@@ -16,21 +16,52 @@ namespace Selise.Ecap.SC.Wopi.WebService
     {
         private static async Task Main(string[] args)
         {
-            BlocksWebApiPipelineBuilderOptions blocksWebApiPipelineBuilderOptions = new BlocksWebApiPipelineBuilderOptions
-            {
-                UseFileLogging = true,
-                UseTracingLogging = true,
-                CommandLineArguments = args,
-                UseAuditLoggerMiddleware = true,
-                AddApplicationServices = AddApplicationServices,
-                UseJwtBearerAuthentication = true,
-                AddRequiredQueues = AddRequiredQueues,
-                ConfigureMiddlewares = ConfigureMiddlewares
-            };
+            //BlocksWebApiPipelineBuilderOptions blocksWebApiPipelineBuilderOptions = new BlocksWebApiPipelineBuilderOptions
+            //{
+            //    UseFileLogging = true,
+            //    UseTracingLogging = true,
+            //    CommandLineArguments = args,
+            //    UseAuditLoggerMiddleware = true,
+            //    AddApplicationServices = AddApplicationServices,
+            //    UseJwtBearerAuthentication = true,
+            //    AddRequiredQueues = AddRequiredQueues,
+            //    ConfigureMiddlewares = ConfigureMiddlewares
+            //};
 
-            // Build and configure the web API pipeline using EcapWebApiPipelineBuilder
-            var pipeline = await BlocksWebApiPipelineBuilder.BuildBlocksWebApiPipeline(blocksWebApiPipelineBuilderOptions);
-            pipeline.Build().Run();
+            //// Build and configure the web API pipeline using EcapWebApiPipelineBuilder
+            //var pipeline = await BlocksWebApiPipelineBuilder.BuildBlocksWebApiPipeline(blocksWebApiPipelineBuilderOptions);
+            //pipeline.Build().Run();
+            var builder = WebApplication.CreateBuilder();
+
+            // Add services to the container
+            builder.Services.AddControllers();
+            builder.Services.AddHttpClient();
+
+            // Configure CORS for WOPI
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader()
+                          .WithExposedHeaders("Content-Disposition", "X-WOPI-ItemVersion", "X-WOPI-Lock");
+                });
+            });
+
+            var app = builder.Build();
+
+            // Configure the HTTP request pipeline
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseCors();
+            app.UseRouting();
+            app.MapControllers();
+
+            app.Run();
 
         }
 

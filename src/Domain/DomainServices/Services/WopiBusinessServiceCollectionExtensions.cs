@@ -1,10 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Selise.Ecap.SC.Wopi.Contracts.DomainServices;
-using Selise.Ecap.SC.Wopi.Contracts.MongoDb;
-using Selise.Ecap.SC.Wopi.Domain.DomainServices;
-using Selise.Ecap.SC.Wopi.Domain.DomainServices.Services;
-using Selise.Ecap.SC.Wopi.Domain.MongoDb;
-using SeliseBlocks.MailService.Driver;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -13,18 +7,6 @@ public static class WopiBusinessServiceCollectionExtensions
 {
     public static void AddWopiBusinessServices(this IServiceCollection services)
     {
-        services.AddTransient<IMongoClientRepository, MongoClientRepository>();
-        services.AddTransient<IMongoDataService, MongoDataService>();
-        services.AddTransient<IMongoSecurityService, MongoSecurityService>();
-        services.AddTransient<IMailServiceClient, MailServiceClient>();
-        services.AddSingleton<IChangeLogService, ChangeLogService>();
-        services.AddSingleton<IConnectionService, ConnectionService>();
-        services.AddSingleton<IStorageDataService, StorageDataService>();
-        services.AddSingleton<ICommonUtilService, CommonUtilService>();
-        services.AddSingleton<ICreateDynamicLink, CreateDynamicLinkService>();
-        services.AddSingleton<IAuthUtilityService, AuthUtilityService>();
-        services.AddSingleton<ICreateDynamicLink, CreateDynamicLinkService>();
-        services.AddSingleton<IWopiFileService, WopiFileService>();
     }
 
     public static void RegisterAllDerivedTypes<T>(
