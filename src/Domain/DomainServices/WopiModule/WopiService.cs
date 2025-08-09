@@ -24,6 +24,9 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
         private readonly IServiceClient _serviceClient;
         private readonly string _localFilePath;
         private readonly string _collaboraBaseUrl;
+        private readonly string _defaultFileName;
+        private readonly string _defaultAccessToken;
+        private readonly string _defaultUserDisplayName;
 
         public WopiService(
             ISecurityContextProvider securityContextProvider,
@@ -34,8 +37,11 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             _securityContextProvider = securityContextProvider;
             _serviceClient = serviceClient;
             _logger = logger;
-            _localFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp_files");
-            _collaboraBaseUrl = configuration["CollaboraBaseUrl"] ?? "https://colabora.rashed.app";
+            _localFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, configuration["LocalFilePath"] ?? "temp_files");
+            _collaboraBaseUrl = configuration["CollaboraBaseUrl"];
+            _defaultFileName = configuration["DefaultFileName"] ?? "Document.docx";
+            _defaultAccessToken = configuration["DefaultAccessToken"] ?? "default-token-123";
+            _defaultUserDisplayName = configuration["DefaultUserDisplayName"] ?? "Anonymous User";
 
             if (!Directory.Exists(_localFilePath))
             {
@@ -73,10 +79,10 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 FileUrl = command.FileUrl,
                 UploadUrl = command.UploadUrl,
                 UploadHeaders = JsonConvert.SerializeObject(command.UploadHeaders ?? new Dictionary<string, string>()),
-                FileName = command.FileName ?? "Document.docx",
-                AccessToken = command.AccessToken ?? "default-token-123",
+                FileName = command.FileName ?? _defaultFileName,
+                AccessToken = command.AccessToken ?? _defaultAccessToken,
                 UserId = command.UserId ?? securityContext?.UserId,
-                UserDisplayName = command.UserDisplayName ?? "Anonymous User",
+                UserDisplayName = command.UserDisplayName ?? _defaultUserDisplayName,
                 CanEdit = command.CanEdit,
                 CreatedAt = DateTime.UtcNow,
                 Downloaded = false,
