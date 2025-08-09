@@ -20,20 +20,17 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
     public class WopiService : IWopiService
     {
         private readonly ILogger<WopiService> _logger;
-        private readonly IRepository _repository;
         private readonly ISecurityContextProvider _securityContextProvider;
         private readonly IServiceClient _serviceClient;
         private readonly string _localFilePath;
         private readonly string _collaboraBaseUrl;
 
         public WopiService(
-            IRepository repository,
             ISecurityContextProvider securityContextProvider,
             IServiceClient serviceClient,
             IConfiguration configuration,
             ILogger<WopiService> logger)
         {
-            _repository = repository;
             _securityContextProvider = securityContextProvider;
             _serviceClient = serviceClient;
             _logger = logger;
@@ -46,14 +43,22 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             }
         }
 
-        public async Task<CreateWopiSessionResponse> CreateWopiSession(CreateWopiSessionCommand command)
+        public Task<CreateWopiSessionResponse> CreateWopiSession(CreateWopiSessionCommand command)
         {
             if (string.IsNullOrEmpty(command.FileUrl))
             {
                 throw new InvalidOperationException("fileUrl is required");
             }
 
-            var securityContext = _securityContextProvider.GetSecurityContext();
+            SecurityContext? securityContext = null;
+            try             
+            {
+                securityContext = _securityContextProvider.GetSecurityContext();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to get security context");
+            }
             var sessionId = Guid.NewGuid().ToString();
 
             var session = new WopiSession
@@ -61,44 +66,41 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 ItemId = Guid.NewGuid().ToString(),
                 CreateDate = DateTime.UtcNow.ToLocalTime(),
                 LastUpdateDate = DateTime.UtcNow.ToLocalTime(),
-                CreatedBy = securityContext.UserId,
-                TenantId = securityContext.TenantId,
-                Language = securityContext.Language,
+                CreatedBy = securityContext?.UserId,
+                TenantId = securityContext?.TenantId,
+                Language = securityContext?.Language,
                 SessionId = sessionId,
                 FileUrl = command.FileUrl,
                 UploadUrl = command.UploadUrl,
                 UploadHeaders = JsonConvert.SerializeObject(command.UploadHeaders ?? new Dictionary<string, string>()),
-                FileName = command.FileName ?? "document.docx",
+                FileName = command.FileName ?? "Document.docx",
                 AccessToken = command.AccessToken ?? "default-token-123",
-                UserId = command.UserId ?? securityContext.UserId,
+                UserId = command.UserId ?? securityContext?.UserId,
                 UserDisplayName = command.UserDisplayName ?? "Anonymous User",
                 CanEdit = command.CanEdit,
                 CreatedAt = DateTime.UtcNow,
                 Downloaded = false,
                 LocalFilePath = Path.Combine(_localFilePath, $"{sessionId}.docx"),
-                DepartmentId = command.DepartmentId,
-                OrganizationId = command.OrganizationId,
-                Tags = new[] { WopiTag.IsValidWopiSession },
-                RolesAllowedToRead = new[] { "Admin", "AppUser" },
-                RolesAllowedToUpdate = new[] { "Admin", "AppUser" },
-                RolesAllowedToDelete = new[] { "Admin" }
+                Tags = new[] { WopiTag.IsValidWopiSession }
             };
 
             // Store session in memory (like JavaScript Map)
             WopiSessionStore.Set(sessionId, session);
-            await _repository.SaveAsync(session);
+            //await _repository.SaveAsync(session);
 
             var wopiSrc = Uri.EscapeDataString($"{_collaboraBaseUrl}/wopi/files/{sessionId}");
-            var editUrl = $"{_collaboraBaseUrl}/browser/a8848448cc/cool.html?WOPISrc={wopiSrc}&access_token={session.AccessToken}";
+            var editUrl = $"{_collaboraBaseUrl}/browser/a8848448cc/cool.html?WOPISrc={wopiSrc}&access_token={command.AccessToken}";
 
-            return new CreateWopiSessionResponse
+            var wopiSession = new CreateWopiSessionResponse
             {
                 SessionId = sessionId,
                 EditUrl = editUrl,
                 WopiSrc = $"{_collaboraBaseUrl}/wopi/files/{sessionId}",
-                AccessToken = session.AccessToken,
+                AccessToken = command.AccessToken,
                 Message = "Session created successfully"
             };
+
+            return Task.FromResult(wopiSession);
         }
 
         public async Task<WopiFileInfo> GetWopiFileInfo(GetWopiFileInfoQuery query)
@@ -199,7 +201,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             }
             
             session.LastUpdateDate = DateTime.UtcNow.ToLocalTime();
-            await _repository.UpdateAsync<WopiSession>(s => s.SessionId == command.SessionId, session);
+            //await _repository.UpdateAsync<WopiSession>(s => s.SessionId == command.SessionId, session);
         }
 
         public List<WopiSessionResponse> GetWopiSessions(GetWopiSessionsQuery query)
@@ -234,7 +236,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 }
 
                 WopiSessionStore.Delete(command.SessionId);
-                await _repository.DeleteAsync<WopiSession>(s => s.SessionId == command.SessionId);
+                //await _repository.DeleteAsync<WopiSession>(s => s.SessionId == command.SessionId);
             }
         }
 
@@ -263,7 +265,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                     await File.WriteAllBytesAsync(session.LocalFilePath, fileContent);
                     
                     session.Downloaded = true;
-                    await _repository.UpdateAsync<WopiSession>(s => s.SessionId == sessionId, session);
+                    //await _repository.UpdateAsync<WopiSession>(s => s.SessionId == sessionId, session);
                 }
                 catch (Exception ex)
                 {
