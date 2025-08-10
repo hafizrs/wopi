@@ -421,6 +421,9 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             {
                 _logger.LogInformation("Uploading file to: {UploadUrl}", command.UploadUrl);
 
+                // Ensure the file exists before uploading
+                await EnsureFileExists(command.SessionId);
+
                 // Read the file content
                 var fileBytes = await File.ReadAllBytesAsync(session.LocalFilePath);
                 
