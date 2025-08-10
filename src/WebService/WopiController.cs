@@ -245,6 +245,41 @@ namespace Selise.Ecap.SC.Wopi.WebService
             }
         }
 
+        // Upload file to external URL endpoint
+        [HttpPost("uploadToUrl")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UploadFileToUrl([FromBody] UploadFileToUrlCommand command)
+        {
+            try
+            {
+                if (command == null)
+                {
+                    return BadRequest("Command cannot be null");
+                }
+
+                if (string.IsNullOrEmpty(command.SessionId))
+                {
+                    return BadRequest("SessionId is required");
+                }
+
+                var success = await _service.UploadFileToUrl(command);
+                
+                if (success)
+                {
+                    return Ok(success);
+                }
+                else
+                {
+                    return NotFound("Session not found or no upload URL provided");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error uploading file to URL for session: {SessionId}", command?.SessionId ?? "unknown");
+                return StatusCode(500, "Error uploading file");
+            }
+        }
+
         private CommandResponse ErrorResponse()
         {
             var response = new CommandResponse();

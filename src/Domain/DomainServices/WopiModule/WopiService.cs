@@ -401,5 +401,70 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             var fileStream = new FileStream(session.LocalFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
             return (fileStream, session.FileName);
         }
+
+        public async Task<bool> UploadFileToUrl(UploadFileToUrlCommand command)
+        {
+            var session = WopiSessionStore.Get(command.SessionId);
+            if (session == null)
+            {
+                _logger.LogInformation("Session not found: {SessionId}", command.SessionId);
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(command.UploadUrl))
+            {
+                _logger.LogInformation("No upload URL provided for session: {SessionId}", command.SessionId);
+                return false;
+            }
+
+            try
+            {
+                _logger.LogInformation("Uploading file to: {UploadUrl}", command.UploadUrl);
+
+                // Ensure the file exists before uploading
+                await EnsureFileExists(command.SessionId);
+
+                // Read the file content
+                var fileBytes = await File.ReadAllBytesAsync(session.LocalFilePath);
+                
+                // Create content with the file bytes
+                using var content = new ByteArrayContent(fileBytes);
+                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+
+                using var request = new HttpRequestMessage(HttpMethod.Post, command.UploadUrl)
+                {
+                    Content = content
+                };
+
+                // Add custom headers if they exist in session
+                if (command.UploadHeaders != null)
+                {
+                    try
+                    {
+                        var uploadHeaders = command.UploadHeaders;
+                        foreach (var header in uploadHeaders)
+                        {
+                            request.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to parse upload headers for session: {SessionId}", command.SessionId);
+                    }
+                }
+
+                var response = await _httpClient.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+
+                _logger.LogInformation("File uploaded successfully to {UploadUrl}, response status: {StatusCode}", command.UploadUrl, response.StatusCode);
+                
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error uploading file to {UploadUrl} for session {SessionId}", command.UploadUrl, command.SessionId);
+                throw;
+            }
+        }
     }
 } 
