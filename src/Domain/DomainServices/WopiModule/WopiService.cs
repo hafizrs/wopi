@@ -521,7 +521,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 using var content = new ByteArrayContent(fileBytes);
                 content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
 
-                using var request = new HttpRequestMessage(HttpMethod.Post, command.UploadUrl)
+                using var request = new HttpRequestMessage(HttpMethod.Put, command.UploadUrl)
                 {
                     Content = content
                 };
@@ -534,7 +534,12 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                         var uploadHeaders = command.UploadHeaders;
                         foreach (var header in uploadHeaders)
                         {
+                            if (request.Headers.Contains(header.Key))
+                            {
+                                request.Headers.Remove(header.Key);
+                            }
                             request.Headers.TryAddWithoutValidation(header.Key, header.Value);
+
                         }
                     }
                     catch (Exception ex)
@@ -544,11 +549,16 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 }
 
                 var response = await _httpClient.SendAsync(request);
-                response.EnsureSuccessStatusCode();
-
-                _logger.LogInformation("File uploaded successfully to {UploadUrl}, response status: {StatusCode}", command.UploadUrl, response.StatusCode);
+                var resultCode = response.EnsureSuccessStatusCode().StatusCode;
                 
-                return true;
+                _logger.LogInformation("UploadFileToUrl Response: -> {ResultCode}", JsonConvert.SerializeObject(resultCode));
+                
+                if (resultCode.Equals(System.Net.HttpStatusCode.OK) || resultCode.Equals(System.Net.HttpStatusCode.Created))
+                {
+                    return true;
+                }
+                
+                return false;
             }
             catch (Exception ex)
             {
@@ -556,7 +566,5 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 throw;
             }
         }
-
-
     }
 } 
