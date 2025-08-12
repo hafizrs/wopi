@@ -19,5 +19,9 @@ namespace Selise.Ecap.SC.Wopi.Contracts.Models.WopiModule
         public string LocalFilePath { get; set; }
         public string DepartmentId { get; set; }
         public string OrganizationId { get; set; }
+        
+        // Computed properties for WOPI interface
+        public string EditUrl { get; set; }
+        public string WopiSrc { get; set; }
     }
 } 

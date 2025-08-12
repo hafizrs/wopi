@@ -83,6 +83,10 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 }
             }
 
+            // Generate edit URL (matching JavaScript implementation exactly)
+            var wopiSrc = Uri.EscapeDataString($"{_collaboraBaseUrl}/wopi/files/{sessionId}");
+            var editUrl = $"{_collaboraBaseUrl}/browser/{_browserPath}/cool.html?WOPISrc={wopiSrc}&access_token={command.AccessToken ?? _defaultAccessToken}";
+
             var session = new WopiSession
             {
                 ItemId = Guid.NewGuid().ToString(),
@@ -103,23 +107,23 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 CreatedAt = DateTime.UtcNow,
                 Downloaded = false,
                 LocalFilePath = Path.Combine(_localFilePath, $"{sessionId}.docx"),
-                Tags = new[] { WopiTag.IsValidWopiSession }
+                Tags = new[] { WopiTag.IsValidWopiSession },
+                
+                // Store computed properties
+                EditUrl = editUrl,
+                WopiSrc = $"{_collaboraBaseUrl}/wopi/files/{sessionId}"
             };
 
             // Store session in memory (like JavaScript Map)
             WopiSessionStore.Set(sessionId, session);
             //await _repository.SaveAsync(session);
 
-            // Generate edit URL (matching JavaScript implementation exactly)
-            var wopiSrc = Uri.EscapeDataString($"{_collaboraBaseUrl}/wopi/files/{sessionId}");
-            var editUrl = $"{_collaboraBaseUrl}/browser/{_browserPath}/cool.html?WOPISrc={wopiSrc}&access_token={session.AccessToken}";
-
             var wopiSession = new CreateWopiSessionResponse
             {
                 SessionId = sessionId,
-                EditUrl = editUrl,
-                WopiSrc = $"{_collaboraBaseUrl}/wopi/files/{sessionId}",
-                AccessToken = session.AccessToken, // Use session's access token
+                EditUrl = session.EditUrl,
+                WopiSrc = session.WopiSrc,
+                AccessToken = session.AccessToken,
                 Message = "Session created successfully"
             };
 
