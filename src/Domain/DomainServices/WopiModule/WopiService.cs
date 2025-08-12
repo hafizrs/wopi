@@ -25,6 +25,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
         private readonly string _defaultFileName;
         private readonly string _defaultAccessToken;
         private readonly string _defaultUserDisplayName;
+        private readonly string _browserPath;
 
         public WopiService(
             HttpClient httpClient,
@@ -38,6 +39,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             _defaultFileName = configuration["DefaultFileName"] ?? "Document.docx";
             _defaultAccessToken = configuration["DefaultAccessToken"] ?? "default-token-123";
             _defaultUserDisplayName = configuration["DefaultUserDisplayName"] ?? "Anonymous User";
+            _browserPath = configuration["BrowserPath"] ?? "a8848448cc";
 
             // Configure HttpClient timeout (like JavaScript axios timeout)
             _httpClient.Timeout = TimeSpan.FromSeconds(60); // 60 second timeout
@@ -46,16 +48,40 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             {
                 Directory.CreateDirectory(_localFilePath);
             }
+
+            // Initialize persistent session storage
+            WopiSessionStore.Initialize(_logger);
+            
+            _logger.LogInformation("WopiService initialized with persistent session storage");
         }
 
-        public Task<CreateWopiSessionResponse> CreateWopiSession(CreateWopiSessionCommand command)
+        public async Task<CreateWopiSessionResponse> CreateWopiSession(CreateWopiSessionCommand command)
         {
             if (string.IsNullOrEmpty(command.FileUrl))
             {
                 throw new InvalidOperationException("fileUrl is required");
             }
           
-            var sessionId = Guid.NewGuid().ToString();
+            var sessionId = command.SessionId ?? Guid.NewGuid().ToString();
+
+            // Check if session already exists and delete it first
+            var existingSession = WopiSessionStore.Get(sessionId);
+            if (existingSession != null)
+            {
+                _logger.LogInformation("Session {SessionId} already exists, deleting old session before creating new one", sessionId);
+                
+                try
+                {
+                    // Use the existing delete method
+                    var deleteCommand = new DeleteWopiSessionCommand { SessionIds = new[] { sessionId } };
+                    await DeleteWopiSession(deleteCommand);
+                    _logger.LogInformation("Successfully deleted existing session {SessionId}", sessionId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to delete existing session {SessionId}, continuing with new session creation", sessionId);
+                }
+            }
 
             var session = new WopiSession
             {
@@ -72,7 +98,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 FileName = command.FileName ?? _defaultFileName,
                 AccessToken = command.AccessToken ?? _defaultAccessToken,
                 UserId = command.UserId ?? "default-user",
-                UserDisplayName = command.UserDisplayName ?? _defaultUserDisplayName,
+                UserDisplayName = command.UserDisplayName ?? "", // Empty string instead of default
                 CanEdit = command.CanEdit,
                 CreatedAt = DateTime.UtcNow,
                 Downloaded = false,
@@ -85,21 +111,21 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             //await _repository.SaveAsync(session);
 
             // Generate edit URL (matching JavaScript implementation exactly)
-            var wopiSrc = Uri.EscapeDataString($"https://colabora.rashed.app/wopi/files/{sessionId}");
-            var editUrl = $"https://colabora.rashed.app/browser/a8848448cc/cool.html?WOPISrc={wopiSrc}&access_token={session.AccessToken}";
+            var wopiSrc = Uri.EscapeDataString($"{_collaboraBaseUrl}/wopi/files/{sessionId}");
+            var editUrl = $"{_collaboraBaseUrl}/browser/{_browserPath}/cool.html?WOPISrc={wopiSrc}&access_token={session.AccessToken}";
 
             var wopiSession = new CreateWopiSessionResponse
             {
                 SessionId = sessionId,
                 EditUrl = editUrl,
-                WopiSrc = $"https://colabora.rashed.app/wopi/files/{sessionId}",
+                WopiSrc = $"{_collaboraBaseUrl}/wopi/files/{sessionId}",
                 AccessToken = session.AccessToken, // Use session's access token
                 Message = "Session created successfully"
             };
 
             _logger.LogInformation("Created session {SessionId} for file: {FileUrl}", sessionId, command.FileUrl);
 
-            return Task.FromResult(wopiSession);
+            return wopiSession;
         }
 
         public async Task<WopiFileInfo> GetWopiFileInfo(GetWopiFileInfoQuery query)
@@ -271,30 +297,90 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
 
         public WopiSessionResponse GetWopiSession(GetWopiSessionQuery query)
         {
+            // First try to get from memory store
             var session = WopiSessionStore.Get(query.SessionId);
-            if (session == null)
+            if (session != null)
             {
-                return null;
+                _logger.LogDebug("Retrieved session from memory: {SessionId}", query.SessionId);
+                return new WopiSessionResponse(session);
             }
 
-            return new WopiSessionResponse(session);
+            // If not in memory, try to load from disk (if you have persistence)
+            _logger.LogWarning("Session not found in memory: {SessionId}", query.SessionId);
+            return null;
         }
 
         public async Task DeleteWopiSession(DeleteWopiSessionCommand command)
         {
-            var session = WopiSessionStore.Get(command.SessionId);
-            if (session != null)
+            if (command.SessionIds == null || command.SessionIds.Length == 0)
             {
-                // Delete local file if exists
-                if (File.Exists(session.LocalFilePath))
-                {
-                    File.Delete(session.LocalFilePath);
-                }
-
-                WopiSessionStore.Delete(command.SessionId);
-                //await _repository.DeleteAsync<WopiSession>(s => s.SessionId == command.SessionId);
-                await Task.Delay(1);
+                _logger.LogWarning("No session IDs provided for deletion");
+                return;
             }
+
+            _logger.LogInformation("Starting batch deletion of {Count} sessions", command.SessionIds.Length);
+
+            // Batch process file deletions for better performance
+            var fileDeletionTasks = new List<Task>();
+            var sessionsToDelete = new List<string>();
+
+            foreach (var sessionId in command.SessionIds)
+            {
+                if (string.IsNullOrEmpty(sessionId))
+                    continue;
+
+                var session = WopiSessionStore.Get(sessionId);
+                if (session != null)
+                {
+                    sessionsToDelete.Add(sessionId);
+                    
+                    // Queue file deletion task
+                    if (File.Exists(session.LocalFilePath))
+                    {
+                        var filePath = session.LocalFilePath;
+                        fileDeletionTasks.Add(Task.Run(() => 
+                        {
+                            try
+                            {
+                                File.Delete(filePath);
+                                _logger.LogDebug("Deleted local file for session: {SessionId}", sessionId);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, "Error deleting file for session: {SessionId}", sessionId);
+                            }
+                        }));
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("Session not found for deletion: {SessionId}", sessionId);
+                }
+            }
+
+            // Wait for all file deletions to complete
+            if (fileDeletionTasks.Count > 0)
+            {
+                _logger.LogInformation("Waiting for {Count} file deletions to complete", fileDeletionTasks.Count);
+                await Task.WhenAll(fileDeletionTasks);
+            }
+
+            // Batch delete from session store
+            foreach (var sessionId in sessionsToDelete)
+            {
+                try
+                {
+                    WopiSessionStore.Delete(sessionId);
+                    //await _repository.DeleteAsync<WopiSession>(s => s.SessionId == sessionId);
+                    _logger.LogDebug("Deleted WOPI session: {SessionId}", sessionId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error deleting session from store: {SessionId}", sessionId);
+                }
+            }
+
+            _logger.LogInformation("Completed batch deletion of {Count} sessions", sessionsToDelete.Count);
         }
 
         public async Task EnsureFileExists(string sessionId)
@@ -466,5 +552,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 throw;
             }
         }
+
+
     }
 } 

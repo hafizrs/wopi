@@ -9,8 +9,11 @@
 
     <ItemGroup>
         <Compile Remove="Builder\**" />
+        <Compile Remove="DomainServices\InvoiceGenerator\**" />
         <EmbeddedResource Remove="Builder\**" />
+        <EmbeddedResource Remove="DomainServices\InvoiceGenerator\**" />
         <None Remove="Builder\**" />
+        <None Remove="DomainServices\InvoiceGenerator\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -42,7 +45,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="DomainServices\InvoiceGenerator" />
         <Folder Include="Repositories\" />
     </ItemGroup>
 </Project>

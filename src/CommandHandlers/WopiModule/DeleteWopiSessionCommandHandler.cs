@@ -31,7 +31,14 @@ namespace Selise.Ecap.SC.Wopi.CommandHandlers.WopiModule
             
             try
             {
+                if (command.SessionIds == null || command.SessionIds.Length == 0)
+                {
+                    response.SetError("WopiSession", "No session IDs provided for deletion");
+                    return response;
+                }
+
                 await _service.DeleteWopiSession(command);
+                _logger.LogInformation("Successfully processed deletion request for {Count} sessions", command.SessionIds.Length);
             }
             catch (Exception ex)
             {

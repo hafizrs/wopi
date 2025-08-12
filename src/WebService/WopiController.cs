@@ -58,11 +58,19 @@ namespace Selise.Ecap.SC.Wopi.WebService
             return _service.GetWopiSession(query);
         }
 
+        [HttpDelete("session")]
+        [AllowAnonymous]
+        public async Task CleanupSessions([FromBody] string[] sessionIds)
+        {
+            var command = new DeleteWopiSessionCommand { SessionIds = sessionIds };
+            await _service.DeleteWopiSession(command);
+        }
+
         [HttpDelete("session/{sessionId}")]
         [AllowAnonymous]
-        public async Task CleanupSession(string sessionId)
+        public async Task CleanupSingleSession(string sessionId)
         {
-            var command = new DeleteWopiSessionCommand { SessionId = sessionId };
+            var command = new DeleteWopiSessionCommand { SessionIds = new[] { sessionId } };
             await _service.DeleteWopiSession(command);
         }
 
@@ -279,6 +287,8 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 return StatusCode(500, "Error uploading file");
             }
         }
+
+
 
         private CommandResponse ErrorResponse()
         {
