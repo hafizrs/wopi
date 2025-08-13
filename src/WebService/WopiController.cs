@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Selise.Ecap.SC.Wopi.Contracts.Commands.WopiModule;
@@ -78,7 +79,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
         // WOPI Protocol Endpoints (following standard WOPI specification)
         [HttpGet("files/{sessionId}")]
         [AllowAnonymous]
-        public async Task<dynamic> CheckFileInfo(string sessionId)
+        public async Task<IResult> CheckFileInfo(string sessionId)
         {
             try
             {
@@ -93,8 +94,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 };
 
                 var result = await _service.GetWopiFileInfo(query);
-                
-                return result;
+                return Results.Json(result);
             }
             catch (UnauthorizedAccessException)
             {
@@ -102,18 +102,18 @@ namespace Selise.Ecap.SC.Wopi.WebService
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("Session not found"))
             {
-                return NotFound("Session not found");
+                return Results.NotFound("Session not found");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in CheckFileInfo");
-                return StatusCode(500, "Failed to get file info");
+                return Results.StatusCode(500);
             }
         }
 
         [HttpGet("files/{sessionId}/contents")]
         [AllowAnonymous]
-        public async Task<dynamic> GetFile(string sessionId)
+        public async Task<IResult> GetFile(string sessionId)
         {
             try
             {
@@ -131,31 +131,31 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 
                 if (result != null)
                 {
-                    return File(result, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+                    return Results.File(result, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
                 }
                 else
                 {
-                    return StatusCode(500);
+                    return Results.StatusCode(500);
                 }
             }
             catch (UnauthorizedAccessException)
             {
-                return Unauthorized();
+                return Results.Unauthorized();
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("Session not found"))
             {
-                return NotFound("Session not found");
+                return Results.NotFound("Session not found");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetFile");
-                return StatusCode(500, "Error streaming file content");
+                return Results.StatusCode(500);
             }
         }
 
         [HttpPost("files/{sessionId}/contents")]
         [AllowAnonymous]
-        public async Task<dynamic> PutFile(string sessionId)
+        public async Task<IResult> PutFile(string sessionId)
         {
             try
             {
@@ -179,35 +179,35 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 
                 if (result != null)
                 {
-                    return result;
+                    return Results.Json(result);
                 }
                 else
                 {
-                    return StatusCode(500, "Error saving file");
+                    return Results.StatusCode(500);
                 }
             }
             catch (UnauthorizedAccessException)
             {
-                return Unauthorized();
+                return Results.Unauthorized();
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("Session not found"))
             {
-                return NotFound("Session not found");
+                return Results.NotFound("Session not found");
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("Edit not allowed"))
             {
-                return StatusCode(403, "Edit not allowed");
+                return Results.StatusCode(403);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in PutFile");
-                return StatusCode(500, "Error saving file");
+                return Results.StatusCode(500);
             }
         }
 
         [HttpPost("files/{sessionId}")]
         [AllowAnonymous]
-        public async Task<dynamic> Lock(string sessionId)
+        public async Task<IResult> Lock(string sessionId)
         {
             try
             {
@@ -228,29 +228,29 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 
                 if (result.fileStream != null)
                 {
-                    return new 
+                    return Results.Json(new
                     {
                         Name = result.fileName,
                         Version = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString()
-                    };
+                    });
                 }
                 else
                 {
-                    return StatusCode(500, "Error in lock operation");
+                    return Results.StatusCode(500);
                 }
             }
             catch (UnauthorizedAccessException)
             {
-                return Unauthorized();
+                return Results.Unauthorized();
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("Session not found"))
             {
-                return NotFound("Session not found");
+                return Results.NotFound("Session not found");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in Lock operation");
-                return StatusCode(500, ex.Message);
+                return Results.StatusCode(500);
             }
         }
 
