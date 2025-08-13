@@ -5,6 +5,7 @@ using Selise.Ecap.SC.Wopi.Contracts.Commands.WopiModule;
 using Selise.Ecap.SC.Wopi.Contracts.DomainServices.WopiModule;
 using Selise.Ecap.SC.Wopi.Contracts.EntityResponse;
 using Selise.Ecap.SC.Wopi.Contracts.Models;
+using Selise.Ecap.SC.Wopi.Contracts.Models.WopiModule;
 using Selise.Ecap.SC.Wopi.Contracts.Queries.WopiModule;
 using Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule;
 using SeliseBlocks.Genesis.Framework.Infrastructure;
@@ -77,7 +78,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
         // WOPI Protocol Endpoints (following standard WOPI specification)
         [HttpGet("files/{sessionId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> CheckFileInfo(string sessionId)
+        public async Task<dynamic> CheckFileInfo(string sessionId)
         {
             try
             {
@@ -93,11 +94,11 @@ namespace Selise.Ecap.SC.Wopi.WebService
 
                 var result = await _service.GetWopiFileInfo(query);
                 
-                return Ok(result);
+                return result;
             }
             catch (UnauthorizedAccessException)
             {
-                return Unauthorized();
+                return null;
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("Session not found"))
             {
@@ -112,7 +113,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
 
         [HttpGet("files/{sessionId}/contents")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetFile(string sessionId)
+        public async Task<dynamic> GetFile(string sessionId)
         {
             try
             {
@@ -154,7 +155,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
 
         [HttpPost("files/{sessionId}/contents")]
         [AllowAnonymous]
-        public async Task<IActionResult> PutFile(string sessionId)
+        public async Task<dynamic> PutFile(string sessionId)
         {
             try
             {
@@ -178,7 +179,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 
                 if (result != null)
                 {
-                    return Ok(result);
+                    return result;
                 }
                 else
                 {
@@ -206,7 +207,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
 
         [HttpPost("files/{sessionId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> Lock(string sessionId)
+        public async Task<dynamic> Lock(string sessionId)
         {
             try
             {
@@ -227,11 +228,11 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 
                 if (result.fileStream != null)
                 {
-                    return Ok(new 
+                    return new 
                     {
                         Name = result.fileName,
                         Version = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString()
-                    });
+                    };
                 }
                 else
                 {
