@@ -37,11 +37,6 @@ namespace Selise.Ecap.SC.Wopi.WebService
             //pipeline.Build().Run();
             var builder = WebApplication.CreateBuilder();
 
-            builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
-            {
-                options.SerializerOptions.PropertyNamingPolicy = null;
-            });
-
             // Add services to the container
             builder.Services.AddControllers();
             builder.Services.AddHttpClient();
@@ -57,6 +52,11 @@ namespace Selise.Ecap.SC.Wopi.WebService
                           .AllowAnyHeader()
                           .WithExposedHeaders("Content-Disposition", "X-WOPI-ItemVersion", "X-WOPI-Lock");
                 });
+            });
+
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = null; // Keep PascalCase
             });
 
             var app = builder.Build();

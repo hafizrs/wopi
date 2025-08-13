@@ -35,11 +35,11 @@ namespace Selise.Ecap.SC.Wopi.WebService
         // Session Management Endpoints (like JavaScript implementation)
         [HttpPost("create-session")]
         [AllowAnonymous]
-        public async Task<CreateWopiSessionResponse> CreateSession([FromBody] CreateWopiSessionCommand command)
+        public async Task<IActionResult> CreateSession([FromBody] CreateWopiSessionCommand command)
         {
             if (command == null) return null;
 
-            return await _service.CreateWopiSession(command);
+            return Ok(await _service.CreateWopiSession(command));
         }
 
         [HttpGet("sessions")]
@@ -79,7 +79,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
         // WOPI Protocol Endpoints (following standard WOPI specification)
         [HttpGet("files/{sessionId}")]
         [AllowAnonymous]
-        public async Task<IResult> CheckFileInfo(string sessionId)
+        public async Task<IActionResult> CheckFileInfo(string sessionId)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 };
 
                 var result = await _service.GetWopiFileInfo(query);
-                return Results.Json(result);
+                return Ok(result);
             }
             catch (UnauthorizedAccessException)
             {
@@ -102,18 +102,18 @@ namespace Selise.Ecap.SC.Wopi.WebService
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("Session not found"))
             {
-                return Results.NotFound("Session not found");
+                return NotFound("Session not found");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in CheckFileInfo");
-                return Results.StatusCode(500);
+                return StatusCode(500);
             }
         }
 
         [HttpGet("files/{sessionId}/contents")]
         [AllowAnonymous]
-        public async Task<IResult> GetFile(string sessionId)
+        public async Task<IActionResult> GetFile(string sessionId)
         {
             try
             {
@@ -131,31 +131,31 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 
                 if (result != null)
                 {
-                    return Results.File(result, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+                    return File(result, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
                 }
                 else
                 {
-                    return Results.StatusCode(500);
+                    return StatusCode(500);
                 }
             }
             catch (UnauthorizedAccessException)
             {
-                return Results.Unauthorized();
+                return Unauthorized();
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("Session not found"))
             {
-                return Results.NotFound("Session not found");
+                return NotFound("Session not found");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetFile");
-                return Results.StatusCode(500);
+                return StatusCode(500);
             }
         }
 
         [HttpPost("files/{sessionId}/contents")]
         [AllowAnonymous]
-        public async Task<IResult> PutFile(string sessionId)
+        public async Task<IActionResult> PutFile(string sessionId)
         {
             try
             {
@@ -179,35 +179,35 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 
                 if (result != null)
                 {
-                    return Results.Json(result);
+                    return Ok(result);
                 }
                 else
                 {
-                    return Results.StatusCode(500);
+                    return StatusCode(500);
                 }
             }
             catch (UnauthorizedAccessException)
             {
-                return Results.Unauthorized();
+                return Unauthorized();
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("Session not found"))
             {
-                return Results.NotFound("Session not found");
+                return NotFound("Session not found");
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("Edit not allowed"))
             {
-                return Results.StatusCode(403);
+                return StatusCode(403);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in PutFile");
-                return Results.StatusCode(500);
+                return StatusCode(500);
             }
         }
 
         [HttpPost("files/{sessionId}")]
         [AllowAnonymous]
-        public async Task<IResult> Lock(string sessionId)
+        public async Task<IActionResult> Lock(string sessionId)
         {
             try
             {
@@ -228,7 +228,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 
                 if (result.fileStream != null)
                 {
-                    return Results.Json(new
+                    return Ok(new
                     {
                         Name = result.fileName,
                         Version = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString()
@@ -236,21 +236,21 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 }
                 else
                 {
-                    return Results.StatusCode(500);
+                    return StatusCode(500);
                 }
             }
             catch (UnauthorizedAccessException)
             {
-                return Results.Unauthorized();
+                return Unauthorized();
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("Session not found"))
             {
-                return Results.NotFound("Session not found");
+                return NotFound("Session not found");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in Lock operation");
-                return Results.StatusCode(500);
+                return StatusCode(500);
             }
         }
 
