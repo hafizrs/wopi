@@ -23,5 +23,6 @@ namespace Selise.Ecap.SC.Wopi.Contracts.Models.WopiModule
         // Computed properties for WOPI interface
         public string EditUrl { get; set; }
         public string WopiSrc { get; set; }
+        public string FileId { get; set; }
     }
 } 

@@ -5,6 +5,7 @@ namespace Selise.Ecap.SC.Wopi.Contracts.Commands.WopiModule
     public class CreateWopiSessionCommand
     {
         public string SessionId { get; set; }
+        public string FileId { get; set; }
         public string FileUrl { get; set; }
         public string UploadUrl { get; set; }
         public Dictionary<string, string> UploadHeaders { get; set; }

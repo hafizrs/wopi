@@ -355,29 +355,6 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                             }
                         }));
                     }
-
-                    // 2. Delete only the specific session cache
-                    string baseCachePath = "/home/azureuser/collabora-config/cache";
-                    string tempCachePath = "/home/azureuser/collabora-config/tmp";
-                    string[] cacheDirs = new string[]
-                    {
-                        Path.Combine(baseCachePath, sessionId),
-                        Path.Combine(tempCachePath, sessionId)
-                    };
-
-                    foreach (var dir in cacheDirs)
-                    {
-                        // Ensure directory exists and ends with sessionId
-                        if (Directory.Exists(dir) && dir.EndsWith(sessionId, StringComparison.Ordinal))
-                        {
-                            Directory.Delete(dir, recursive: true);
-                            _logger.LogInformation("Deleted Collabora cache: {dir}", dir);
-                        }
-                        else
-                        {
-                            _logger.LogWarning("Skipped deleting folder (not matching session ID): {dir}", dir);
-                        }
-                    }
                 }
                 else
                 {
