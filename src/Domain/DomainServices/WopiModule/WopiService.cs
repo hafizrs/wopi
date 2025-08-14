@@ -221,7 +221,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             
             _logger.LogInformation("GetFile - Streaming file for session: {SessionId}", query.SessionId);
             // Return file stream (like JavaScript fs.createReadStream)
-            return new FileStream(session.LocalFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            return new FileStream(session.LocalFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
         }
 
         // Direct method matching JavaScript GetFile flow exactly
@@ -248,7 +248,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             _logger.LogInformation("GetFile - Streaming file for session: {SessionId}", sessionId);
             
             // Return file stream (like JavaScript fs.createReadStream)
-            var fileStream = new FileStream(session.LocalFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var fileStream = new FileStream(session.LocalFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
             return (fileStream, session.FileName);
         }
 
