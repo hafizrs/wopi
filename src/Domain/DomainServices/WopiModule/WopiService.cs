@@ -102,7 +102,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 FileName = command.FileName ?? _defaultFileName,
                 AccessToken = command.AccessToken ?? _defaultAccessToken,
                 UserId = command.UserId ?? "default-user",
-                UserDisplayName = command.UserDisplayName ?? "", // Empty string instead of default
+                UserDisplayName = command.UserDisplayName ?? null,
                 CanEdit = command.CanEdit,
                 CreatedAt = DateTime.UtcNow,
                 Downloaded = false,
@@ -162,7 +162,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 UserId = session.UserId,
                 UserCanWrite = session.CanEdit,
                 UserCanRename = false,
-                UserCanNotWriteRelative = false,
+                UserCanNotWriteRelative = true,
                 Version = DateTime.UtcNow.Ticks.ToString(),
                 UserFriendlyName = session.UserDisplayName,
                 PostMessageOrigin = _collaboraBaseUrl,
@@ -354,6 +354,30 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                                 _logger.LogError(ex, "Error deleting file for session: {SessionId}", sessionId);
                             }
                         }));
+                    }
+
+                    // 2. Delete only the specific session cache
+                    string baseCachePath = "/var/cache/coolwsd";
+                    string tempCachePath = "/var/tmp/loolwsd";
+
+                    string[] cacheDirs = new string[]
+                    {
+                        Path.Combine(baseCachePath, sessionId),
+                        Path.Combine(tempCachePath, sessionId)
+                    };
+
+                    foreach (var dir in cacheDirs)
+                    {
+                        // Ensure directory exists and ends with sessionId
+                        if (Directory.Exists(dir) && dir.EndsWith(sessionId, StringComparison.Ordinal))
+                        {
+                            Directory.Delete(dir, recursive: true);
+                            _logger.LogInformation("Deleted Collabora cache: {dir}", dir);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Skipped deleting folder (not matching session ID): {dir}", dir);
+                        }
                     }
                 }
                 else
