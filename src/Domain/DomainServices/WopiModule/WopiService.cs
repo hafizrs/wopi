@@ -168,7 +168,6 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 UserCanWrite = session.CanEdit, // CRITICAL: Must be true for editing
                 UserCanRename = false,
                 UserCanNotWriteRelative = true,
-                Version = DateTime.UtcNow.Ticks.ToString(),
                 UserFriendlyName = session.UserDisplayName,
                 PostMessageOrigin = _collaboraBaseUrl,
                 // Additional permissions for editing
@@ -188,7 +187,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 SupportsCheckFileInfo = true,
                 SupportsDeleteFile = false,
                 SupportsRenameFile = false,
-                SupportsPutRelativeFile = false,
+                SupportsPutRelativeFile = true,
                 SupportsGetFileWopiSrc = false,
                 SupportsExecuteCobaltRequest = false,
                 SupportsUserInfo = false,
@@ -222,34 +221,6 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             _logger.LogInformation("GetFile - Streaming file for session: {SessionId}", query.SessionId);
             // Return file stream (like JavaScript fs.createReadStream)
             return new FileStream(session.LocalFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
-        }
-
-        // Direct method matching JavaScript GetFile flow exactly
-        public async Task<(Stream fileStream, string fileName)> GetWopiFileContentDirect(string sessionId, string accessToken)
-        {
-            // Get session (like JavaScript fileConfigs.get(sessionId))
-            var session = WopiSessionStore.Get(sessionId);
-            if (session == null)
-            {
-                throw new InvalidOperationException("Session not found");
-            }
-
-            // Check for authentication (like JavaScript)
-            _logger.LogInformation("GetFile - Token received: {AccessToken}", accessToken);
-            if (string.IsNullOrEmpty(accessToken) || accessToken != session.AccessToken)
-            {
-                _logger.LogWarning("GetFile - Authentication failed");
-                throw new UnauthorizedAccessException("Unauthorized");
-            }
-
-            // Get file from local storage (like JavaScript ensureFileExists)
-            await EnsureFileExists(sessionId);
-            
-            _logger.LogInformation("GetFile - Streaming file for session: {SessionId}", sessionId);
-            
-            // Return file stream (like JavaScript fs.createReadStream)
-            var fileStream = new FileStream(session.LocalFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
-            return (fileStream, session.FileName);
         }
 
         public async Task<UpdateWopiFileResponse> UpdateWopiFile(UpdateWopiFileCommand command)
