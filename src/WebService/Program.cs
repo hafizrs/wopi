@@ -50,7 +50,9 @@ namespace Selise.Ecap.SC.Wopi.WebService
                     policy.AllowAnyOrigin()
                           .AllowAnyMethod()
                           .AllowAnyHeader()
-                          .WithExposedHeaders("Content-Disposition", "X-WOPI-ItemVersion", "X-WOPI-Lock");
+                          .WithExposedHeaders("Content-Disposition", "X-WOPI-ItemVersion", "X-WOPI-Lock")
+                          .WithHeaders("Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization",
+                               "X-WOPI-Override", "X-WOPI-Lock", "X-WOPI-ItemVersion");
                 });
             });
 

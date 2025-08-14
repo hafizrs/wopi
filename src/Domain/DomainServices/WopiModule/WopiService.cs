@@ -162,7 +162,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 Size = fileInfo.Length,
                 OwnerId = session.UserId,
                 UserId = session.UserId,
-                UserCanWrite = session.CanEdit,
+                UserCanWrite = true,
                 UserCanRename = false,
                 UserCanNotWriteRelative = true,
                 Version = DateTime.UtcNow.Ticks.ToString(),
@@ -174,7 +174,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 SupportsGetLock = true,
                 SupportsExtendedLockLength = true,
                 SupportsCobalt = false,
-                SupportsUpdate = session.CanEdit,
+                SupportsUpdate = true,
                 UserCanPresent = false
             };
         }
