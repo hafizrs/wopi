@@ -4,6 +4,7 @@ using Selise.Ecap.SC.Wopi.Contracts.Models.WopiModule;
 using Selise.Ecap.SC.Wopi.Contracts.Queries.WopiModule;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Selise.Ecap.SC.Wopi.Contracts.DomainServices.WopiModule
@@ -21,6 +22,6 @@ namespace Selise.Ecap.SC.Wopi.Contracts.DomainServices.WopiModule
         WopiSessionResponse GetWopiSession(GetWopiSessionQuery query);
         Task EnsureFileExists(string sessionId);
         Task<object> UploadFile(string sessionId, byte[] fileBuffer);
-        Task<bool> UploadFileToUrl(UploadFileToUrlCommand command);
+        Task<bool> UploadFileToUrl(UploadFileToUrlCommand command, CancellationToken cancellationToken = default);
     }
 } 

@@ -11,7 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
@@ -492,7 +494,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             return (fileStream, session.FileName);
         }
 
-        public async Task<bool> UploadFileToUrl(UploadFileToUrlCommand command)
+        public async Task<bool> UploadFileToUrl(UploadFileToUrlCommand command, CancellationToken cancellationToken = default)
         {
             var session = WopiSessionStore.Get(command.SessionId);
             if (session == null)
@@ -517,53 +519,50 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 // Read the file content
                 var fileBytes = await File.ReadAllBytesAsync(session.LocalFilePath);
                 
-                // Create content with the file bytes
-                using var content = new ByteArrayContent(fileBytes);
-
-                using var request = new HttpRequestMessage(HttpMethod.Put, command.UploadUrl)
-                {
-                    Content = content
-                };
-
-                // Add custom headers if they exist in session
-                if (command.UploadHeaders != null)
-                {
-                    try
-                    {
-                        var uploadHeaders = command.UploadHeaders;
-                        foreach (var header in uploadHeaders)
-                        {
-                            if (request.Headers.Contains(header.Key))
-                            {
-                                request.Headers.Remove(header.Key);
-                            }
-                            request.Headers.TryAddWithoutValidation(header.Key, header.Value);
-
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Failed to parse upload headers for session: {SessionId}", command.SessionId);
-                    }
-                }
-
-                var response = await _httpClient.SendAsync(request);
-                var resultCode = response.EnsureSuccessStatusCode().StatusCode;
-                
-                _logger.LogInformation("UploadFileToUrl Response: -> {ResultCode}", JsonConvert.SerializeObject(resultCode));
-                
-                if (resultCode.Equals(System.Net.HttpStatusCode.OK) || resultCode.Equals(System.Net.HttpStatusCode.Created))
-                {
-                    return true;
-                }
-                
-                return false;
+                // Use the improved upload method
+                return await UploadFileToStorageByUrlAsync(command.UploadUrl, fileBytes, command.UploadHeaders, cancellationToken);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error uploading file to {UploadUrl} for session {SessionId}", command.UploadUrl, command.SessionId);
                 throw;
             }
+        }
+
+        public async Task<bool> UploadFileToStorageByUrlAsync(
+            string uploadUrl,
+            byte[] bytes,
+            Dictionary<string, string> customHeaders = null,
+            CancellationToken token = default)
+        {
+            using var client = new HttpClient();
+            using var request = new HttpRequestMessage(HttpMethod.Put, uploadUrl)
+            {
+                Content = new ByteArrayContent(bytes)
+            };
+
+            // Add custom headers if provided
+            if (customHeaders != null)
+            {
+                foreach (var header in customHeaders)
+                {
+                    if (request.Headers.Contains(header.Key))
+                    {
+                        request.Headers.Remove(header.Key);
+                    }
+                    request.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                }
+            }
+
+            using var response = await client.SendAsync(
+                                     request,
+                                     HttpCompletionOption.ResponseHeadersRead,
+                                     token).ConfigureAwait(false);
+
+            var code = response.EnsureSuccessStatusCode().StatusCode;
+            _logger.LogInformation("Blob upload → {StatusCode}", (int)code);
+
+            return code is HttpStatusCode.OK or HttpStatusCode.Created;
         }
     }
 } 
