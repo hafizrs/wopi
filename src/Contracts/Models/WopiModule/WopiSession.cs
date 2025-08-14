@@ -24,5 +24,11 @@ namespace Selise.Ecap.SC.Wopi.Contracts.Models.WopiModule
         public string EditUrl { get; set; }
         public string WopiSrc { get; set; }
         public string FileId { get; set; }
+        
+        // Lock state management
+        public bool IsLocked { get; set; }
+        public string LockId { get; set; }
+        public DateTime? LockExpires { get; set; }
+        public string LockedBy { get; set; }
     }
 } 

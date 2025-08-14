@@ -193,7 +193,10 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 SupportsExecuteCobaltRequest = false,
                 SupportsUserInfo = false,
                 SupportsFolders = false,
-                SupportsFileCreation = false
+                SupportsFileCreation = false,
+                
+                // Additional critical properties for Collabora
+                AllowWrite = session.CanEdit     // CRITICAL: Must match UserCanWrite
             };
         }
 

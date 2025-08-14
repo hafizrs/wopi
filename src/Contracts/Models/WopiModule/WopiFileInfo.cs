@@ -36,5 +36,8 @@ namespace Selise.Ecap.SC.Wopi.Contracts.Models.WopiModule
         public bool SupportsUserInfo { get; set; }
         public bool SupportsFolders { get; set; }
         public bool SupportsFileCreation { get; set; }
+        
+        // Additional critical properties for Collabora
+        public bool AllowWrite { get; set; }
     }
 } 

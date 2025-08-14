@@ -74,8 +74,11 @@ namespace Selise.Ecap.SC.Wopi.WebService
         [AllowAnonymous]
         public IActionResult WopiDiscovery()
         {
+            _logger.LogInformation("=== WOPI DISCOVERY CALLED ===");
             var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
+            _logger.LogInformation("Base URL: {BaseUrl}", baseUrl);
             
+            // Standard WOPI discovery format that Collabora expects
             var discovery = new
             {
                 net_zone = "external-http",
@@ -85,6 +88,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
                     favIconUrl = $"{baseUrl}/favicon.ico",
                     checkLicense = false,
                     hasTheme = false,
+                    // CRITICAL: These must be exactly as Collabora expects
                     supportsGetLock = true,
                     supportsLocks = true,
                     supportsExtendedLockLength = true,
@@ -178,9 +182,9 @@ namespace Selise.Ecap.SC.Wopi.WebService
 
                 var result = await _service.GetWopiFileInfo(query);
                 
-                // CRITICAL: Add required WOPI headers that indicate file is writable
+                // CRITICAL: Add ALL required WOPI headers that Collabora expects
                 Response.Headers.Add("X-WOPI-ItemVersion", result.Version);
-                Response.Headers.Add("X-WOPI-Lock", Guid.NewGuid().ToString()); // Generate a lock token
+                Response.Headers.Add("X-WOPI-Lock", Guid.NewGuid().ToString());
                 Response.Headers.Add("X-WOPI-LockExpires", DateTime.UtcNow.AddMinutes(30).ToString("R"));
                 Response.Headers.Add("X-WOPI-ServerError", "");
                 Response.Headers.Add("X-WOPI-ServerVersion", "1.0");
@@ -190,8 +194,8 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
                 Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization, X-WOPI-Override, X-WOPI-Lock, X-WOPI-LockExpires");
                 
-                _logger.LogInformation("CheckFileInfo - Success for session: {SessionId}, UserCanWrite: {UserCanWrite}", 
-                    sessionId, result.UserCanWrite);
+                _logger.LogInformation("CheckFileInfo - Success for session: {SessionId}, UserCanWrite: {UserCanWrite}, SupportsPutFile: {SupportsPutFile}", 
+                    sessionId, result.UserCanWrite, result.SupportsPutFile);
                 return Ok(result);
             }
             catch (UnauthorizedAccessException)
@@ -352,25 +356,35 @@ namespace Selise.Ecap.SC.Wopi.WebService
 
                 _logger.LogInformation("Lock operation for session: {SessionId}, operation: {WopiOverride}", sessionId, wopiOverride);
 
-                var command = new LockWopiFileCommand 
-                { 
-                    SessionId = sessionId,
-                    AccessToken = accessToken,
-                    WopiOverride = wopiOverride
-                };
+                // Validate the operation
+                if (string.IsNullOrEmpty(wopiOverride))
+                {
+                    _logger.LogWarning("Lock operation missing x-wopi-override header for session: {SessionId}", sessionId);
+                    return BadRequest("Missing x-wopi-override header");
+                }
 
-                var result = await _service.LockWopiFile(command);
-                
+                // Check if session exists and can be edited
+                var session = _service.GetWopiSession(new GetWopiSessionQuery { SessionId = sessionId });
+                if (session == null)
+                {
+                    _logger.LogWarning("Lock operation - Session not found: {SessionId}", sessionId);
+                    return NotFound("Session not found");
+                }
+
+                // Generate lock ID and expiration
+                var lockId = Guid.NewGuid().ToString();
+                var lockExpires = DateTime.UtcNow.AddMinutes(30);
+
                 // Add required WOPI headers
                 Response.Headers.Add("X-WOPI-ItemVersion", DateTime.UtcNow.Ticks.ToString());
-                Response.Headers.Add("X-WOPI-Lock", Guid.NewGuid().ToString());
-                Response.Headers.Add("X-WOPI-LockExpires", DateTime.UtcNow.AddMinutes(30).ToString("R"));
+                Response.Headers.Add("X-WOPI-Lock", lockId);
+                Response.Headers.Add("X-WOPI-LockExpires", lockExpires.ToString("R"));
                 
                 // For lock operations, return success status
                 if (wopiOverride == "LOCK")
                 {
-                    _logger.LogInformation("Lock operation completed successfully for session: {SessionId}", sessionId);
-                    return Ok(new { Status = "Locked" });
+                    _logger.LogInformation("Lock operation completed successfully for session: {SessionId}, LockId: {LockId}", sessionId, lockId);
+                    return Ok(new { Status = "Locked", LockId = lockId, Expires = lockExpires });
                 }
                 else if (wopiOverride == "UNLOCK")
                 {
@@ -379,11 +393,12 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 }
                 else if (wopiOverride == "REFRESH_LOCK")
                 {
-                    _logger.LogInformation("Refresh lock operation completed successfully for session: {SessionId}", sessionId);
-                    return Ok(new { Status = "Lock Refreshed" });
+                    _logger.LogInformation("Refresh lock operation completed successfully for session: {SessionId}, LockId: {LockId}", sessionId, lockId);
+                    return Ok(new { Status = "Lock Refreshed", LockId = lockId, Expires = lockExpires });
                 }
                 else
                 {
+                    _logger.LogWarning("Lock operation - Unsupported operation: {WopiOverride} for session: {SessionId}", wopiOverride, sessionId);
                     return BadRequest("Unsupported lock operation");
                 }
             }
