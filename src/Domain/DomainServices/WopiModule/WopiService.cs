@@ -233,63 +233,83 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
 
         public async Task<UpdateWopiFileResponse> UpdateWopiFile(UpdateWopiFileCommand command)
         {
+            _logger.LogInformation("UpdateWopiFile called for session: {SessionId}", command.SessionId);
+            
             var session = WopiSessionStore.Get(command.SessionId);
             if (session == null)
             {
+                _logger.LogWarning("UpdateWopiFile - Session not found: {SessionId}", command.SessionId);
                 throw new InvalidOperationException("Session not found");
             }
 
             // Check for authentication
             if (command.AccessToken != session.AccessToken)
             {
+                _logger.LogWarning("UpdateWopiFile - Authentication failed for session: {SessionId}", command.SessionId);
                 throw new UnauthorizedAccessException("Unauthorized");
             }
 
             if (!session.CanEdit)
             {
+                _logger.LogWarning("UpdateWopiFile - Edit not allowed for session: {SessionId}", command.SessionId);
                 throw new InvalidOperationException("Edit not allowed");
             }
             
-            _logger.LogInformation($"PutFile - Saving file for session: {command.SessionId}");
-            _logger.LogInformation($"PutFile - File size: {command.FileContent.Length}");
+            _logger.LogInformation("PutFile - Saving file for session: {SessionId}, File size: {FileSize} bytes", 
+                command.SessionId, command.FileContent?.Length ?? 0);
             
-            // Save the updated file locally
-            await File.WriteAllBytesAsync(session.LocalFilePath, command.FileContent);
-            
-            // Upload to external service if configured
-            object uploadResult = null;
-            string uploadStatus = "Not configured";
-            
-            if (!string.IsNullOrEmpty(session.UploadUrl))
+            try
             {
-                try
+                // Save the updated file locally
+                await File.WriteAllBytesAsync(session.LocalFilePath, command.FileContent);
+                _logger.LogInformation("PutFile - File saved locally for session: {SessionId}", command.SessionId);
+                
+                // Upload to external service if configured
+                object uploadResult = null;
+                string uploadStatus = "Not configured";
+                
+                if (!string.IsNullOrEmpty(session.UploadUrl))
                 {
-                    uploadResult = await UploadFile(command.SessionId, command.FileContent);
-                    uploadStatus = "Success";
-                    _logger.LogInformation("PutFile - File uploaded to external service");
+                    try
+                    {
+                        _logger.LogInformation("PutFile - Uploading to external service: {UploadUrl}", session.UploadUrl);
+                        uploadResult = await UploadFile(command.SessionId, command.FileContent);
+                        uploadStatus = "Success";
+                        _logger.LogInformation("PutFile - File uploaded to external service for session: {SessionId}", command.SessionId);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "PutFile - Upload failed for session: {SessionId}, but file saved locally", command.SessionId);
+                        uploadStatus = "Failed";
+                        // Continue even if upload fails
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    _logger.LogError(ex, "PutFile - Upload failed, but file saved locally");
-                    uploadStatus = "Failed";
-                    // Continue even if upload fails
+                    _logger.LogInformation("PutFile - No external upload URL configured for session: {SessionId}", command.SessionId);
                 }
+                
+                session.LastUpdateDate = DateTime.UtcNow.ToLocalTime();
+                session.Downloaded = true; // Mark as downloaded since we now have local content
+                //await _repository.UpdateAsync<WopiSession>(s => s.SessionId == command.SessionId, session);
+                
+                _logger.LogInformation("PutFile - File saved successfully for session: {SessionId}", command.SessionId);
+                
+                // Return success response (matching JavaScript implementation)
+                return new UpdateWopiFileResponse
+                {
+                    LastModifiedTime = DateTime.UtcNow.ToString("O"), // ISO 8601 format
+                    Name = session.FileName,
+                    Size = command.FileContent.Length,
+                    Version = DateTime.UtcNow.Ticks.ToString(),
+                    UploadResult = uploadStatus
+                };
             }
-            
-            session.LastUpdateDate = DateTime.UtcNow.ToLocalTime();
-            //await _repository.UpdateAsync<WopiSession>(s => s.SessionId == command.SessionId, session);
-            
-            _logger.LogInformation("PutFile - File saved successfully");
-            
-            // Return success response (matching JavaScript implementation)
-            return new UpdateWopiFileResponse
+            catch (Exception ex)
             {
-                LastModifiedTime = DateTime.UtcNow.ToString("O"), // ISO 8601 format
-                Name = session.FileName,
-                Size = command.FileContent.Length,
-                Version = DateTime.UtcNow.Ticks.ToString(),
-                UploadResult = uploadStatus
-            };
+                _logger.LogError(ex, "PutFile - Error saving file for session: {SessionId}", command.SessionId);
+                throw;
+            }
         }
 
         public List<WopiSessionResponse> GetWopiSessions(GetWopiSessionsQuery query)
@@ -484,14 +504,15 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 throw new InvalidOperationException("Unsupported operation");
             }
 
-            // Get file from local storage (like JavaScript ensureFileExists)
+            // For lock operations, we don't need to return file content
+            // Just ensure the file exists and return success
             await EnsureFileExists(command.SessionId);
 
-            _logger.LogInformation("GetFile - Streaming file for session: {SessionId}", command.SessionId);
+            _logger.LogInformation("Lock operation completed for session: {SessionId}, operation: {WopiOverride}", command.SessionId, command.WopiOverride);
 
-            // Return file stream (like JavaScript fs.createReadStream)
-            var fileStream = new FileStream(session.LocalFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            return (fileStream, session.FileName);
+            // Return empty stream for lock operations (they don't need file content)
+            var emptyStream = new MemoryStream();
+            return (emptyStream, session.FileName);
         }
 
         public async Task<bool> UploadFileToUrl(UploadFileToUrlCommand command, CancellationToken cancellationToken = default)

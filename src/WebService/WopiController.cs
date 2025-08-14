@@ -32,6 +32,47 @@ namespace Selise.Ecap.SC.Wopi.WebService
             _service = service;
         }
 
+        // WOPI Discovery endpoint
+        [HttpGet("")]
+        [AllowAnonymous]
+        public IActionResult WopiDiscovery()
+        {
+            var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
+            
+            var discovery = new
+            {
+                net_zone = "external-http",
+                app = new
+                {
+                    name = "WOPI Host",
+                    favIconUrl = $"{baseUrl}/favicon.ico",
+                    checkLicense = false,
+                    hasTheme = false,
+                    supportsGetLock = true,
+                    supportsLocks = true,
+                    supportsExtendedLockLength = true,
+                    supportsFileCreation = false,
+                    supportsRename = false,
+                    supportsDeleteFile = false,
+                    supportsUserInfo = false,
+                    supportsFolders = false,
+                    supportsUpdate = true,
+                    supportsCobalt = false,
+                    supportsGetFileWopiSrc = false,
+                    supportsPutFile = true,
+                    supportsPutRelativeFile = false,
+                    supportsUnlock = true,
+                    supportsRefreshLock = true,
+                    supportsLock = true,
+                    supportsGetFile = true,
+                    supportsCheckFileInfo = true,
+                    supportsExecuteCobaltRequest = false,
+                }
+            };
+
+            return Ok(discovery);
+        }
+
         // Session Management Endpoints (like JavaScript implementation)
         [HttpPost("create-session")]
         [AllowAnonymous]
@@ -94,11 +135,19 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 };
 
                 var result = await _service.GetWopiFileInfo(query);
+                
+                // Add required WOPI headers
+                Response.Headers.Add("X-WOPI-ItemVersion", result.Version);
+                Response.Headers.Add("X-WOPI-Lock", Guid.NewGuid().ToString()); // Generate a lock token
+                Response.Headers.Add("X-WOPI-LockExpires", DateTime.UtcNow.AddMinutes(30).ToString("R"));
+                Response.Headers.Add("X-WOPI-ServerError", "");
+                Response.Headers.Add("X-WOPI-ServerVersion", "1.0");
+                
                 return Ok(result);
             }
             catch (UnauthorizedAccessException)
             {
-                return null;
+                return Unauthorized();
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("Session not found"))
             {
@@ -131,6 +180,11 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 
                 if (result != null)
                 {
+                    // Add required WOPI headers
+                    Response.Headers.Add("X-WOPI-ItemVersion", DateTime.UtcNow.Ticks.ToString());
+                    Response.Headers.Add("X-WOPI-Lock", Guid.NewGuid().ToString());
+                    Response.Headers.Add("X-WOPI-LockExpires", DateTime.UtcNow.AddMinutes(30).ToString("R"));
+                    
                     return File(result, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
                 }
                 else
@@ -159,14 +213,24 @@ namespace Selise.Ecap.SC.Wopi.WebService
         {
             try
             {
+                _logger.LogInformation("PutFile called for session: {SessionId}", sessionId);
+                
                 // Get access token from query or header
                 var accessToken = Request.Query["access_token"].FirstOrDefault() ?? 
                                 Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
+
+                // Log all headers for debugging
+                foreach (var header in Request.Headers)
+                {
+                    _logger.LogInformation("Header: {Key} = {Value}", header.Key, header.Value);
+                }
 
                 // Read the file content from request body
                 using var memoryStream = new MemoryStream();
                 await Request.Body.CopyToAsync(memoryStream);
                 var fileContent = memoryStream.ToArray();
+
+                _logger.LogInformation("PutFile - File content size: {Size} bytes", fileContent.Length);
 
                 var command = new UpdateWopiFileCommand 
                 { 
@@ -175,10 +239,16 @@ namespace Selise.Ecap.SC.Wopi.WebService
                     FileContent = fileContent
                 };
 
-                var result = await _service.UpdateWopiFile(command); ;
+                var result = await _service.UpdateWopiFile(command);
                 
                 if (result != null)
                 {
+                    // Add required WOPI headers
+                    Response.Headers.Add("X-WOPI-ItemVersion", result.Version);
+                    Response.Headers.Add("X-WOPI-Lock", Guid.NewGuid().ToString());
+                    Response.Headers.Add("X-WOPI-LockExpires", DateTime.UtcNow.AddMinutes(30).ToString("R"));
+                    
+                    _logger.LogInformation("PutFile completed successfully for session: {SessionId}", sessionId);
                     return Ok(result);
                 }
                 else
@@ -188,19 +258,22 @@ namespace Selise.Ecap.SC.Wopi.WebService
             }
             catch (UnauthorizedAccessException)
             {
+                _logger.LogWarning("PutFile unauthorized for session: {SessionId}", sessionId);
                 return Unauthorized();
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("Session not found"))
             {
+                _logger.LogWarning("PutFile session not found: {SessionId}", sessionId);
                 return NotFound("Session not found");
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("Edit not allowed"))
             {
+                _logger.LogWarning("PutFile edit not allowed for session: {SessionId}", sessionId);
                 return StatusCode(403);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in PutFile");
+                _logger.LogError(ex, "Error in PutFile for session: {SessionId}", sessionId);
                 return StatusCode(500);
             }
         }
@@ -217,6 +290,8 @@ namespace Selise.Ecap.SC.Wopi.WebService
 
                 var wopiOverride = Request.Headers["x-wopi-override"].FirstOrDefault();
 
+                _logger.LogInformation("Lock operation for session: {SessionId}, operation: {WopiOverride}", sessionId, wopiOverride);
+
                 var command = new LockWopiFileCommand 
                 { 
                     SessionId = sessionId,
@@ -225,6 +300,11 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 };
 
                 var result = await _service.LockWopiFile(command);
+                
+                // Add required WOPI headers
+                Response.Headers.Add("X-WOPI-ItemVersion", DateTime.UtcNow.Ticks.ToString());
+                Response.Headers.Add("X-WOPI-Lock", Guid.NewGuid().ToString());
+                Response.Headers.Add("X-WOPI-LockExpires", DateTime.UtcNow.AddMinutes(30).ToString("R"));
                 
                 if (result.fileStream != null)
                 {
@@ -288,8 +368,6 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 return StatusCode(500, "Error uploading file");
             }
         }
-
-
 
         private CommandResponse ErrorResponse()
         {
