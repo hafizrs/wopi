@@ -357,9 +357,8 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                     }
 
                     // 2. Delete only the specific session cache
-                    string baseCachePath = "/var/cache/coolwsd";
-                    string tempCachePath = "/var/tmp/loolwsd";
-
+                    string baseCachePath = "/home/azureuser/collabora-config/cache";
+                    string tempCachePath = "/home/azureuser/collabora-config/tmp";
                     string[] cacheDirs = new string[]
                     {
                         Path.Combine(baseCachePath, sessionId),
