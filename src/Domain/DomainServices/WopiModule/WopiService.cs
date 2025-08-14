@@ -518,7 +518,8 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
 
                 // Read the file content
                 var fileBytes = await File.ReadAllBytesAsync(session.LocalFilePath);
-                
+
+                _logger.LogInformation("File Bytes length: {len}", fileBytes?.Length ?? 0);
                 // Use the improved upload method
                 return await UploadFileToStorageByUrlAsync(command.UploadUrl, fileBytes, command.UploadHeaders, cancellationToken);
             }
