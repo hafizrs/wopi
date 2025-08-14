@@ -519,7 +519,6 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 
                 // Create content with the file bytes
                 using var content = new ByteArrayContent(fileBytes);
-                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
 
                 using var request = new HttpRequestMessage(HttpMethod.Put, command.UploadUrl)
                 {
