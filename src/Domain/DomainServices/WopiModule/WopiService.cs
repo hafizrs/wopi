@@ -168,6 +168,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 UserCanWrite = session.CanEdit, // CRITICAL: Must be true for editing
                 UserCanRename = false,
                 UserCanNotWriteRelative = true,
+                Version = DateTime.UtcNow.Ticks.ToString(), // CRITICAL: Required for X-WOPI-ItemVersion header
                 UserFriendlyName = session.UserDisplayName,
                 PostMessageOrigin = _collaboraBaseUrl,
                 // Additional permissions for editing

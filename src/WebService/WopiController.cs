@@ -101,7 +101,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
                     supportsCobalt = false,
                     supportsGetFileWopiSrc = false,
                     supportsPutFile = true,
-                    supportsPutRelativeFile = false,
+                    supportsPutRelativeFile = true,
                     supportsUnlock = true,
                     supportsRefreshLock = true,
                     supportsLock = true,
@@ -384,17 +384,29 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 if (wopiOverride == "LOCK")
                 {
                     _logger.LogInformation("Lock operation completed successfully for session: {SessionId}, LockId: {LockId}", sessionId, lockId);
-                    return Ok(new { Status = "Locked", LockId = lockId, Expires = lockExpires });
+                    // Return proper WOPI response format
+                    return Ok(new { 
+                        Name = session.FileName,
+                        Version = DateTime.UtcNow.Ticks.ToString()
+                    });
                 }
                 else if (wopiOverride == "UNLOCK")
                 {
                     _logger.LogInformation("Unlock operation completed successfully for session: {SessionId}", sessionId);
-                    return Ok(new { Status = "Unlocked" });
+                    // Return proper WOPI response format
+                    return Ok(new { 
+                        Name = session.FileName,
+                        Version = DateTime.UtcNow.Ticks.ToString()
+                    });
                 }
                 else if (wopiOverride == "REFRESH_LOCK")
                 {
                     _logger.LogInformation("Refresh lock operation completed successfully for session: {SessionId}, LockId: {LockId}", sessionId, lockId);
-                    return Ok(new { Status = "Lock Refreshed", LockId = lockId, Expires = lockExpires });
+                    // Return proper WOPI response format
+                    return Ok(new { 
+                        Name = session.FileName,
+                        Version = DateTime.UtcNow.Ticks.ToString()
+                    });
                 }
                 else
                 {
