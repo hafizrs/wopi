@@ -105,7 +105,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 AccessToken = command.AccessToken ?? _defaultAccessToken,
                 UserId = command.UserId ?? "default-user",
                 UserDisplayName = command.UserDisplayName ?? null,
-                CanEdit = command.CanEdit,
+                CanEdit = command.CanEdit || true, // Ensure CanEdit is true by default
                 CreatedAt = DateTime.UtcNow,
                 Downloaded = false,
                 LocalFilePath = Path.Combine(_localFilePath, $"{sessionId}.docx"),
@@ -129,7 +129,8 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 Message = "Session created successfully"
             };
 
-            _logger.LogInformation("Created session {SessionId} for file: {FileUrl}", sessionId, command.FileUrl);
+            _logger.LogInformation("Created session {SessionId} for file: {FileUrl}, CanEdit: {CanEdit}, UserCanWrite: {UserCanWrite}", 
+                sessionId, command.FileUrl, session.CanEdit, true);
 
             return wopiSession;
         }
@@ -155,14 +156,16 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             await EnsureFileExists(query.SessionId);
             var fileInfo = new FileInfo(session.LocalFilePath);
             
-            _logger.LogInformation("CheckFileInfo - Success for session: {SessionId}", query.SessionId);
+            _logger.LogInformation("CheckFileInfo - Success for session: {SessionId}, CanEdit: {CanEdit}", 
+                query.SessionId, session.CanEdit);
+            
             return new WopiFileInfo
             {
                 BaseFileName = session.FileName,
                 Size = fileInfo.Length,
                 OwnerId = session.UserId,
                 UserId = session.UserId,
-                UserCanWrite = true,
+                UserCanWrite = session.CanEdit, // CRITICAL: Must be true for editing
                 UserCanRename = false,
                 UserCanNotWriteRelative = true,
                 Version = DateTime.UtcNow.Ticks.ToString(),
@@ -175,7 +178,22 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 SupportsExtendedLockLength = true,
                 SupportsCobalt = false,
                 SupportsUpdate = true,
-                UserCanPresent = false
+                UserCanPresent = false,
+                
+                // CRITICAL: Set all the missing properties that Collabora needs
+                SupportsPutFile = true,           // This is the key one!
+                SupportsUnlock = true,
+                SupportsRefreshLock = true,
+                SupportsGetFile = true,
+                SupportsCheckFileInfo = true,
+                SupportsDeleteFile = false,
+                SupportsRenameFile = false,
+                SupportsPutRelativeFile = false,
+                SupportsGetFileWopiSrc = false,
+                SupportsExecuteCobaltRequest = false,
+                SupportsUserInfo = false,
+                SupportsFolders = false,
+                SupportsFileCreation = false
             };
         }
 

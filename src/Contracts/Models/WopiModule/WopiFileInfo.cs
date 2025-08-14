@@ -21,5 +21,20 @@ namespace Selise.Ecap.SC.Wopi.Contracts.Models.WopiModule
         public bool SupportsCobalt { get; set; }
         public bool SupportsUpdate { get; set; }
         public bool UserCanPresent { get; set; }
+        
+        // CRITICAL MISSING PROPERTIES for Collabora to recognize writable files
+        public bool SupportsPutFile { get; set; }
+        public bool SupportsUnlock { get; set; }
+        public bool SupportsRefreshLock { get; set; }
+        public bool SupportsGetFile { get; set; }
+        public bool SupportsCheckFileInfo { get; set; }
+        public bool SupportsDeleteFile { get; set; }
+        public bool SupportsRenameFile { get; set; }
+        public bool SupportsPutRelativeFile { get; set; }
+        public bool SupportsGetFileWopiSrc { get; set; }
+        public bool SupportsExecuteCobaltRequest { get; set; }
+        public bool SupportsUserInfo { get; set; }
+        public bool SupportsFolders { get; set; }
+        public bool SupportsFileCreation { get; set; }
     }
 } 

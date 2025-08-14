@@ -32,6 +32,43 @@ namespace Selise.Ecap.SC.Wopi.WebService
             _service = service;
         }
 
+        // Handle OPTIONS requests for CORS preflight
+        [HttpOptions("files/{sessionId}")]
+        [HttpOptions("files/{sessionId}/contents")]
+        [AllowAnonymous]
+        public IActionResult HandleOptions(string sessionId)
+        {
+            _logger.LogInformation("OPTIONS request received for session: {SessionId}", sessionId);
+            
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+            Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization, X-WOPI-Override, X-WOPI-Lock, X-WOPI-LockExpires, X-WOPI-ItemVersion, X-WOPI-ServerError, X-WOPI-ServerVersion");
+            Response.Headers.Add("Access-Control-Max-Age", "86400");
+            
+            return Ok();
+        }
+
+        // Test endpoint to verify service is working
+        [HttpGet("test")]
+        [AllowAnonymous]
+        public IActionResult Test()
+        {
+            _logger.LogInformation("Test endpoint called");
+            return Ok(new { 
+                Message = "WOPI Service is running", 
+                Timestamp = DateTime.UtcNow,
+                Endpoints = new[] {
+                    "GET /wopi - WOPI Discovery",
+                    "POST /wopi/create-session - Create Session",
+                    "GET /wopi/files/{sessionId} - Check File Info",
+                    "GET /wopi/files/{sessionId}/contents - Get File",
+                    "POST /wopi/files/{sessionId}/contents - Put File",
+                    "POST /wopi/files/{sessionId} - Lock/Unlock",
+                    "GET /wopi/sessions - Get All Sessions"
+                }
+            });
+        }
+
         // WOPI Discovery endpoint
         [HttpGet("")]
         [AllowAnonymous]
@@ -66,9 +103,12 @@ namespace Selise.Ecap.SC.Wopi.WebService
                     supportsLock = true,
                     supportsGetFile = true,
                     supportsCheckFileInfo = true,
-                    supportsExecuteCobaltRequest = false,
+                    supportsExecuteCobaltRequest = false
                 }
             };
+
+            _logger.LogInformation("WOPI Discovery endpoint called, returning capabilities: {Capabilities}", 
+                System.Text.Json.JsonSerializer.Serialize(discovery));
 
             return Ok(discovery);
         }
@@ -124,6 +164,8 @@ namespace Selise.Ecap.SC.Wopi.WebService
         {
             try
             {
+                _logger.LogInformation("CheckFileInfo called for session: {SessionId}", sessionId);
+                
                 // Get access token from query or header
                 var accessToken = Request.Query["access_token"].FirstOrDefault() ?? 
                                 Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
@@ -136,26 +178,35 @@ namespace Selise.Ecap.SC.Wopi.WebService
 
                 var result = await _service.GetWopiFileInfo(query);
                 
-                // Add required WOPI headers
+                // CRITICAL: Add required WOPI headers that indicate file is writable
                 Response.Headers.Add("X-WOPI-ItemVersion", result.Version);
                 Response.Headers.Add("X-WOPI-Lock", Guid.NewGuid().ToString()); // Generate a lock token
                 Response.Headers.Add("X-WOPI-LockExpires", DateTime.UtcNow.AddMinutes(30).ToString("R"));
                 Response.Headers.Add("X-WOPI-ServerError", "");
                 Response.Headers.Add("X-WOPI-ServerVersion", "1.0");
                 
+                // Add CORS headers for WOPI
+                Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+                Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization, X-WOPI-Override, X-WOPI-Lock, X-WOPI-LockExpires");
+                
+                _logger.LogInformation("CheckFileInfo - Success for session: {SessionId}, UserCanWrite: {UserCanWrite}", 
+                    sessionId, result.UserCanWrite);
                 return Ok(result);
             }
             catch (UnauthorizedAccessException)
             {
+                _logger.LogWarning("CheckFileInfo - Unauthorized for session: {SessionId}", sessionId);
                 return Unauthorized();
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("Session not found"))
             {
+                _logger.LogWarning("CheckFileInfo - Session not found: {SessionId}", sessionId);
                 return NotFound("Session not found");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in CheckFileInfo");
+                _logger.LogError(ex, "Error in CheckFileInfo for session: {SessionId}", sessionId);
                 return StatusCode(500);
             }
         }
@@ -213,16 +264,24 @@ namespace Selise.Ecap.SC.Wopi.WebService
         {
             try
             {
+                _logger.LogInformation("=== PUTFILE CALLED ===");
                 _logger.LogInformation("PutFile called for session: {SessionId}", sessionId);
+                _logger.LogInformation("Request Method: {Method}", Request.Method);
+                _logger.LogInformation("Request Path: {Path}", Request.Path);
+                _logger.LogInformation("Request QueryString: {QueryString}", Request.QueryString);
+                _logger.LogInformation("Content-Type: {ContentType}", Request.ContentType);
+                _logger.LogInformation("Content-Length: {ContentLength}", Request.ContentLength);
                 
                 // Get access token from query or header
                 var accessToken = Request.Query["access_token"].FirstOrDefault() ?? 
                                 Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
 
+                _logger.LogInformation("Access Token: {AccessToken}", accessToken);
+
                 // Log all headers for debugging
                 foreach (var header in Request.Headers)
                 {
-                    _logger.LogInformation("Header: {Key} = {Value}", header.Key, header.Value);
+                    _logger.LogInformation("Header: {Key} = {Value}", header.Key, string.Join(", ", header.Value));
                 }
 
                 // Read the file content from request body
@@ -253,6 +312,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 }
                 else
                 {
+                    _logger.LogError("PutFile - Service returned null result for session: {SessionId}", sessionId);
                     return StatusCode(500);
                 }
             }
@@ -306,17 +366,25 @@ namespace Selise.Ecap.SC.Wopi.WebService
                 Response.Headers.Add("X-WOPI-Lock", Guid.NewGuid().ToString());
                 Response.Headers.Add("X-WOPI-LockExpires", DateTime.UtcNow.AddMinutes(30).ToString("R"));
                 
-                if (result.fileStream != null)
+                // For lock operations, return success status
+                if (wopiOverride == "LOCK")
                 {
-                    return Ok(new
-                    {
-                        Name = result.fileName,
-                        Version = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString()
-                    });
+                    _logger.LogInformation("Lock operation completed successfully for session: {SessionId}", sessionId);
+                    return Ok(new { Status = "Locked" });
+                }
+                else if (wopiOverride == "UNLOCK")
+                {
+                    _logger.LogInformation("Unlock operation completed successfully for session: {SessionId}", sessionId);
+                    return Ok(new { Status = "Unlocked" });
+                }
+                else if (wopiOverride == "REFRESH_LOCK")
+                {
+                    _logger.LogInformation("Refresh lock operation completed successfully for session: {SessionId}", sessionId);
+                    return Ok(new { Status = "Lock Refreshed" });
                 }
                 else
                 {
-                    return StatusCode(500);
+                    return BadRequest("Unsupported lock operation");
                 }
             }
             catch (UnauthorizedAccessException)
@@ -329,7 +397,7 @@ namespace Selise.Ecap.SC.Wopi.WebService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in Lock operation");
+                _logger.LogError(ex, "Error in Lock operation for session: {SessionId}", sessionId);
                 return StatusCode(500);
             }
         }
