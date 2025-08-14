@@ -420,7 +420,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                     response.EnsureSuccessStatusCode();
                     
                     using var contentStream = await response.Content.ReadAsStreamAsync();
-                    using var fileStream = new FileStream(session.LocalFilePath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);
+                    using var fileStream = new FileStream(session.LocalFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite, 8192, true);
                     
                     await contentStream.CopyToAsync(fileStream);
                     
