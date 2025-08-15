@@ -20,7 +20,6 @@ namespace Selise.Ecap.SC.Wopi.Contracts.DomainServices.WopiModule
         List<WopiSessionResponse> GetWopiSessions(GetWopiSessionsQuery query);
         WopiSessionResponse GetWopiSession(GetWopiSessionQuery query);
         Task EnsureFileExists(string sessionId);
-        Task<object> UploadFile(string sessionId, byte[] fileBuffer);
         Task<bool> UploadFileToUrl(UploadFileToUrlCommand command, CancellationToken cancellationToken = default);
     }
 } 

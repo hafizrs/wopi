@@ -1,5 +1,7 @@
+using Aspose.Pdf.Operators;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using Newtonsoft.Json;
 using Selise.Ecap.SC.Wopi.Contracts.Commands.WopiModule;
 using Selise.Ecap.SC.Wopi.Contracts.Constants;
@@ -28,6 +30,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
         private readonly string _defaultAccessToken;
         private readonly string _defaultUserDisplayName;
         private readonly string _browserPath;
+        private readonly object _lock = new object();
 
         public WopiService(
             HttpClient httpClient,
@@ -254,34 +257,33 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             try
             {
                 // Save the updated file locally
-                await File.WriteAllBytesAsync(session.LocalFilePath, command.FileContent);
+                FileReadWriteInLock(session.LocalFilePath, command.FileContent, true);
                 _logger.LogInformation("PutFile - File saved locally for session: {SessionId}", command.SessionId);
                 
                 // Upload to external service if configured
-                object uploadResult = null;
+                bool? uploadResult = null;
                 string uploadStatus = "Not configured";
-                
-                if (!string.IsNullOrEmpty(session.UploadUrl))
+
+                try
                 {
-                    try
+                    uploadResult = await UploadFile(command.SessionId, command.FileContent);
+                    if (uploadResult == true)
                     {
-                        _logger.LogInformation("PutFile - Uploading to external service: {UploadUrl}", session.UploadUrl);
-                        uploadResult = await UploadFile(command.SessionId, command.FileContent);
                         uploadStatus = "Success";
                         _logger.LogInformation("PutFile - File uploaded to external service for session: {SessionId}", command.SessionId);
                     }
-                    catch (Exception ex)
+                    else if (uploadResult == false)
                     {
-                        _logger.LogError(ex, "PutFile - Upload failed for session: {SessionId}, but file saved locally", command.SessionId);
                         uploadStatus = "Failed";
-                        // Continue even if upload fails
+                        _logger.LogError("PutFile - Upload failed for session: {SessionId}, but file saved locally", command.SessionId);
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    _logger.LogInformation("PutFile - No external upload URL configured for session: {SessionId}", command.SessionId);
+                    uploadStatus = "Failed";
+                    _logger.LogError(ex, "PutFile - Upload failed for session: {SessionId}, but file saved locally", command.SessionId);
                 }
-                
+
                 session.LastUpdateDate = DateTime.UtcNow.ToLocalTime();
                 session.Downloaded = true; // Mark as downloaded since we now have local content
                 //await _repository.UpdateAsync<WopiSession>(s => s.SessionId == command.SessionId, session);
@@ -437,8 +439,25 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             }
         }
 
-        public async Task<object> UploadFile(string sessionId, byte[] fileBuffer)
+        private byte[] FileReadWriteInLock(string localFilePath, byte[] fileBites, bool isWrite)
         {
+            lock(_lock)
+            {
+                if (isWrite)
+                {
+                    File.WriteAllBytesAsync(localFilePath, fileBites).GetAwaiter().GetResult();
+                    return null;
+                }
+                else
+                {
+                    return File.ReadAllBytesAsync(localFilePath).GetAwaiter().GetResult();
+                }
+            }
+        }
+
+        private async Task<bool?> UploadFile(string sessionId, byte[] fileBuffer, Dictionary<string, string> uploadHeaders = null)
+        {
+            await Task.Delay(100);
             var session = WopiSessionStore.Get(sessionId);
             if (session == null || string.IsNullOrEmpty(session.UploadUrl))
             {
@@ -450,33 +469,14 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             {
                 _logger.LogInformation($"Uploading file to: {session.UploadUrl}");
                 
-                var uploadHeaders = JsonConvert.DeserializeObject<Dictionary<string, string>>(session.UploadHeaders ?? "{}");
-                
-                using var content = new ByteArrayContent(fileBuffer);
-                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-                
-                using var request = new HttpRequestMessage(HttpMethod.Post, session.UploadUrl)
-                {
-                    Content = content
-                };
-                
-                // Add custom headers
-                foreach (var header in uploadHeaders)
-                {
-                    request.Headers.TryAddWithoutValidation(header.Key, header.Value);
-                }
+                uploadHeaders ??= JsonConvert.DeserializeObject<Dictionary<string, string>>(session.UploadHeaders ?? "{}");
 
-                var response = await _httpClient.SendAsync(request);
-                response.EnsureSuccessStatusCode();
-
-                _logger.LogInformation("File uploaded successfully, response status: {StatusCode}", response.StatusCode);
-                var result = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<object>(result);
+                return await UploadFileToStorageByUrlAsync(session.UploadUrl, fileBuffer, uploadHeaders);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error uploading file");
-                throw;
+                return false;
             }
         }
 
@@ -527,11 +527,24 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             {
                 _logger.LogInformation("Uploading file to: {UploadUrl}", command.UploadUrl);
 
+                // Update the session's UploadUrl and UploadHeaders for large file handling
+                // This ensures that if PutFile is called later, it will use the latest upload URL
+                var originalUploadUrl = session.UploadUrl;
+                session.UploadUrl = command.UploadUrl;  // Always update with the new upload URL
+                session.UploadHeaders = JsonConvert.SerializeObject(command.UploadHeaders ?? new Dictionary<string, string>());
+                session.LastUpdateDate = DateTime.UtcNow.ToLocalTime();
+
+                // Update both in-memory and disk storage
+                WopiSessionStore.Set(command.SessionId, session);
+                
+                _logger.LogInformation("Updated session {SessionId} UploadUrl from {OldUrl} to {NewUrl}", 
+                    command.SessionId, originalUploadUrl, command.UploadUrl);
+
                 // Ensure the file exists before uploading
                 await EnsureFileExists(command.SessionId);
 
                 // Read the file content
-                var fileBytes = await File.ReadAllBytesAsync(session.LocalFilePath);
+                var fileBytes = FileReadWriteInLock(session.LocalFilePath, null, false);
 
                 _logger.LogInformation("File Bytes length: {len}", fileBytes?.Length ?? 0);
                 // Use the improved upload method
