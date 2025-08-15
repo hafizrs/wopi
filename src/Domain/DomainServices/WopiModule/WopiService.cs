@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Newtonsoft.Json;
+using System.Collections.Concurrent;
 using Selise.Ecap.SC.Wopi.Contracts.Commands.WopiModule;
 using Selise.Ecap.SC.Wopi.Contracts.Constants;
 using Selise.Ecap.SC.Wopi.Contracts.DomainServices.WopiModule;
@@ -30,7 +31,9 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
         private readonly string _defaultAccessToken;
         private readonly string _defaultUserDisplayName;
         private readonly string _browserPath;
-        private readonly object _lock = new object();
+        private readonly ConcurrentDictionary<string, SemaphoreSlim> _sessionLocks = new ConcurrentDictionary<string, SemaphoreSlim>(); // Session-level locks
+        private const int BUFFER_SIZE = 64 * 1024; // 64KB buffer for streaming operations
+        private const int LOCK_TIMEOUT_SECONDS = 300; // 5 minute timeout for lock operations (for large file uploads)
 
         public WopiService(
             HttpClient httpClient,
@@ -57,7 +60,37 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             // Initialize persistent session storage
             WopiSessionStore.Initialize(_logger);
             
-            _logger.LogInformation("WopiService initialized with persistent session storage");
+            _logger.LogInformation("WopiService initialized with async session storage and streaming operations");
+        }
+
+        // Helper method to get or create session-specific locks
+        private SemaphoreSlim GetOrCreateSessionLock(string sessionId)
+        {
+            return _sessionLocks.GetOrAdd(sessionId, _ => new SemaphoreSlim(1, 1));
+        }
+
+        // Method to get lock status for monitoring (useful for debugging)
+        public Dictionary<string, bool> GetSessionLockStatus()
+        {
+            var status = new Dictionary<string, bool>();
+            foreach (var kvp in _sessionLocks)
+            {
+                status[kvp.Key] = kvp.Value.CurrentCount == 0; // true = locked, false = available
+            }
+            return status;
+        }
+
+        // Get current lock timeout configuration
+        public int GetLockTimeoutSeconds() => LOCK_TIMEOUT_SECONDS;
+
+        // Implement IDisposable to properly dispose of all session locks
+        public void Dispose()
+        {
+            foreach (var sessionLock in _sessionLocks.Values)
+            {
+                sessionLock?.Dispose();
+            }
+            _sessionLocks.Clear();
         }
 
         public async Task<CreateWopiSessionResponse> CreateWopiSession(CreateWopiSessionCommand command)
@@ -256,8 +289,8 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             
             try
             {
-                // Save the updated file locally
-                FileReadWriteInLock(session.LocalFilePath, command.FileContent, true);
+                // Save the updated file locally using async lock
+                await FileReadWriteInLockAsync(session.LocalFilePath, command.FileContent, true, CancellationToken.None);
                 _logger.LogInformation("PutFile - File saved locally for session: {SessionId}", command.SessionId);
                 
                 // Upload to external service if configured
@@ -386,7 +419,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 await Task.WhenAll(fileDeletionTasks);
             }
 
-            // Batch delete from session store
+            // Batch delete from session store and clean up locks
             foreach (var sessionId in sessionsToDelete)
             {
                 try
@@ -394,6 +427,13 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                     WopiSessionStore.Delete(sessionId);
                     //await _repository.DeleteAsync<WopiSession>(s => s.SessionId == sessionId);
                     _logger.LogDebug("Deleted WOPI session: {SessionId}", sessionId);
+                    
+                    // Clean up session lock
+                    if (_sessionLocks.TryRemove(sessionId, out var sessionLock))
+                    {
+                        sessionLock?.Dispose();
+                        _logger.LogDebug("Cleaned up lock for deleted session: {SessionId}", sessionId);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -439,19 +479,45 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             }
         }
 
-        private byte[] FileReadWriteInLock(string localFilePath, byte[] fileBites, bool isWrite)
+        private async Task<byte[]> FileReadWriteInLockAsync(string localFilePath, byte[] fileBytes, bool isWrite, CancellationToken cancellationToken = default)
         {
-            lock(_lock)
+            // Extract session ID from file path for session-level locking
+            var sessionId = Path.GetFileNameWithoutExtension(localFilePath);
+            var sessionLock = GetOrCreateSessionLock(sessionId);
+            
+            // Try to acquire lock with timeout
+            if (!await sessionLock.WaitAsync(TimeSpan.FromSeconds(LOCK_TIMEOUT_SECONDS), cancellationToken))
+            {
+                throw new TimeoutException($"Operation timed out waiting for lock on session {sessionId}. Lock timeout: {LOCK_TIMEOUT_SECONDS} seconds (5 minutes).");
+            }
+            
+            try
             {
                 if (isWrite)
                 {
-                    File.WriteAllBytesAsync(localFilePath, fileBites).GetAwaiter().GetResult();
+                    await File.WriteAllBytesAsync(localFilePath, fileBytes, cancellationToken);
                     return null;
                 }
                 else
                 {
-                    return File.ReadAllBytesAsync(localFilePath).GetAwaiter().GetResult();
+                    // Use streaming for large files to avoid memory issues
+                    using var fileStream = new FileStream(localFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    using var memoryStream = new MemoryStream();
+                    
+                    var buffer = new byte[BUFFER_SIZE];
+                    int bytesRead;
+                    
+                    while ((bytesRead = await fileStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
+                    {
+                        await memoryStream.WriteAsync(buffer, 0, bytesRead, cancellationToken);
+                    }
+                    
+                    return memoryStream.ToArray();
                 }
+            }
+            finally
+            {
+                sessionLock.Release();
             }
         }
 
@@ -543,8 +609,8 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 // Ensure the file exists before uploading
                 await EnsureFileExists(command.SessionId);
 
-                // Read the file content
-                var fileBytes = FileReadWriteInLock(session.LocalFilePath, null, false);
+                // Read the file content using async lock
+                var fileBytes = await FileReadWriteInLockAsync(session.LocalFilePath, null, false, cancellationToken);
 
                 _logger.LogInformation("File Bytes length: {len}", fileBytes?.Length ?? 0);
                 // Use the improved upload method
@@ -564,9 +630,12 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             CancellationToken token = default)
         {
             using var client = new HttpClient();
+            
+            // Use streaming content for better memory management with large files
+            using var streamContent = new StreamContent(new MemoryStream(bytes));
             using var request = new HttpRequestMessage(HttpMethod.Put, uploadUrl)
             {
-                Content = new ByteArrayContent(bytes)
+                Content = streamContent
             };
 
             // Add custom headers if provided
@@ -592,5 +661,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
 
             return code is HttpStatusCode.OK or HttpStatusCode.Created;
         }
+
+
     }
 } 
