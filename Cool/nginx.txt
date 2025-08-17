@@ -1,0 +1,68 @@
+server {
+    listen 80;
+    server_name colabora.rashed.app;
+
+    # Allow WOPI endpoints via HTTP (for Collabora container access)
+    location /wopi/ {
+ rewrite ^/wopi/(.*)$ /$1 break;
+proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto http;
+    }
+
+    # Redirect everything else to HTTPS
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# HTTPS server
+server {
+    listen 443 ssl;
+    server_name colabora.rashed.app;
+
+    # Your SSL certificates
+    ssl_certificate /etc/letsencrypt/live/colabora.rashed.app/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/colabora.rashed.app/privkey.pem;
+
+    # WOPI endpoints
+    location /wopi/ {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+
+  location /browser/ {
+        proxy_pass http://localhost:9980;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        # Remove headers that block iframes
+        proxy_hide_header Content-Security-Policy;
+        proxy_hide_header X-Frame-Options;
+
+        # Add permissive headers
+        add_header X-Frame-Options "ALLOWALL";
+    }
+
+    # Collabora Online
+    location / {
+        proxy_pass http://localhost:9980;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+    }
+}

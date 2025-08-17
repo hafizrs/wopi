@@ -1,0 +1,120 @@
+<config>
+  <allowed_languages desc="List of supported languages of Writing Aids (spell checker, grammar checker, thesaurus, hyphenation) on this instance. Allowing too many has negative effect on startup performance." default="de_DE en_GB en_US es_ES fr_FR it nl pt_BR pt_PT ru">de_DE en_GB en_US es_ES fr_FR it nl pt_BR pt_PT ru</allowed_languages>
+  <sys_template_path desc="Path to a template tree with shared libraries etc to be used as source for chroot jails for child processes." type="path" relative="true" default="systemplate"></sys_template_path>
+  <child_root_path desc="Path to the directory under which the chroot jails for the child processes will be created. Should be on the same file system as sys_template_path. Must be an empty directory." type="path" relative="true" default="jails"></child_root_path>
+  <server_name desc="External hostname:port of the server running coolwsd. If empty, it's derived from the request (please set it if this doesn't work). May be specified when behind a reverse-proxy or when the hostname is not reachable directly." type="string" default="">colabora.rashed.app</server_name>
+
+  <!-- Essential file server and performance settings -->
+  <file_server_root_path desc="Path to the directory that should be considered root for the file server. This should be the directory containing cool." type="path" relative="true" default="browser/../"></file_server_root_path>
+  <memproportion desc="The maximum percentage of system memory consumed by all of the Collabora Online Development Edition, after which we start cleaning up idle documents" type="double" default="80.0">80.0</memproportion>
+  <num_prespawn_children desc="Number of child processes to keep started in advance and waiting for new clients." type="uint" default="1">2</num_prespawn_children>
+
+  <!-- Document settings -->
+  <per_document desc="Per-document settings, including LO Core settings.">
+    <max_concurrency desc="The maximum number of threads to use while processing a document." type="uint" default="4">4</max_concurrency>
+    <idle_timeout_secs desc="The maximum number of seconds before unloading an idle document. Defaults to 1 hour." type="uint" default="3600">3600</idle_timeout_secs>
+    <idlesave_duration_secs desc="The number of idle seconds after which document, if modified, should be saved. Disabled when 0. Defaults to 30 seconds." type="uint" default="30">30</idlesave_duration_secs>
+    <autosave_duration_secs desc="The number of seconds after which document, if modified, should be saved. Disabled when 0. Defaults to 5 minutes." type="uint" default="300">300</autosave_duration_secs>
+    <limit_load_secs desc="Maximum number of seconds to wait for a document load to succeed. 0 for unlimited." type="uint" default="100">100</limit_load_secs>
+    <limit_convert_secs desc="Maximum number of seconds to wait for a document conversion to succeed. 0 for unlimited." type="uint" default="100">100</limit_convert_secs>
+  </per_document>
+
+  <!-- Per view settings -->
+  <per_view desc="Per-view settings.">
+    <out_of_focus_timeout_secs desc="The maximum number of seconds before dimming and stopping updates when the browser tab is no longer in focus. Defaults to 120 seconds." type="uint" default="120">120</out_of_focus_timeout_secs>
+    <idle_timeout_secs desc="The maximum number of seconds before dimming and stopping updates when the user is no longer active (even if the browser is in focus). Defaults to 15 minutes." type="uint" default="900">900</idle_timeout_secs>
+  </per_view>
+
+  <!-- UI customization -->
+  <loleaflet_html desc="Allows UI customization by replacing the single endpoint of coolwsd" type="string" default="cool.html">cool.html</loleaflet_html>
+
+
+    <logging>
+        <color type="bool">true</color>
+        <level type="string" desc="Can be 0-8, or none (turns off logging), fatal, critical, error, warning, notice, information, debug, trace" default="warning">warning</level>
+        <protocol type="bool" desc="Enable protocol level debugging" default="false">false</protocol>
+        <lokit_sal_log type="string" desc="Desktop debug logging" default="">-INFO-WARN</lokit_sal_log>
+        <file enable="false">
+            <property name="path" desc="Log file path.">/var/log/coolwsd.log</property>
+            <property name="rotation" desc="Log file rotation strategy. See Poco FileChannel.">never</property>
+            <property name="archive" desc="Append either (age) or (size) of unit to the archived log filename to avoid conflicts.">timestamp</property>
+            <property name="compress" desc="Enable/disable log file compression.">true</property>
+            <property name="purgeAge" desc="The maximum age of log files to preserve. See Poco FileChannel.">10 days</property>
+            <property name="purgeCount" desc="The maximum number of log files to preserve. Use 'none' to disable purging. See Poco FileChannel.">10</property>
+            <property name="rotateOnOpen" desc="Enable/disable log file rotation on opening.">true</property>
+            <property name="flush" desc="Enable/disable flushing after logging each line. May harm performance. Note that without flushing after each line, the log lines from the different processes will not appear in chronological order.">false</property>
+        </file>
+        <anonymize>
+            <anonymize_user_data type="bool" desc="Enable to anonymize/obfuscate of user-data in logs. If default is true, then log anonymization is enabled. Useful for debugging anonymized logs." default="false">false</anonymize_user_data>
+        </anonymize>
+    </logging>
+
+    <trace desc="Dump commands and notifications for replay. When 'snapshot' is true, the source file is copied to the path first." enable="false">
+        <path desc="Output file path, use '%' for timestamp, '%d' for pid" type="string" default="/tmp/looltrace-%.gz"></path>
+        <filter>
+            <message desc="Regex pattern of messages to exclude"></message>
+        </filter>
+        <outgoing>
+            <record desc="Enable recording of outgoing messages" type="bool" default="false">false</record>
+        </outgoing>
+        <snapshot>
+            <enable type="bool" default="false">false</enable>
+            <path desc="Path to copy the source file to" type="string" default=""></path>
+        </snapshot>
+    </trace>
+
+    <net desc="Network settings">
+        <proto type="string" default="all" desc="Protocol to use IPv4, IPv6 or all for both">all</proto>
+        <listen type="string" default="any" desc="Listen address that coolwsd binds to. Can be 'any' or 'loopback'.">any</listen>
+        <service_root type="path" default="" desc="Prefix all the pages, websockets, etc. with this path."></service_root>
+        <frame_ancestors desc="Specify who is allowed to embed the Collabora Online iframe (coolwsd and WOPI host are always allowed). Separate multiple hosts by space."></frame_ancestors>
+        <connection_timeout_secs desc="Specifies the connection, send, recv timeout in seconds for connections initiated by coolwsd (such as WOPI connections)." type="int" default="300">300</connection_timeout_secs>
+    </net>
+
+    <ssl desc="SSL settings">
+        <enable type="bool" default="true">false</enable>
+        <termination desc="Connection via proxy where coolwsd acts as working via https, but actually uses http." type="bool" default="true">true</termination>
+    </ssl>
+
+    <welcome>
+        <enable type="bool" desc="Controls whether the welcome screen should be shown to the users on new install and updates." default="true">false</enable>
+        <enable_button type="bool" desc="Controls whether the welcome screen should have an explanatory button instead of an X button to close the dialog." default="false">false</enable_button>
+        <path desc="Path to 'welcome-$lang.html' files served on first start or when the version changes" type="path" relative="true" default="welcome"></path>
+    </welcome>
+
+    <storage desc="Backend storage">
+        <filesystem allow="false" />
+        <wopi desc="Allow/deny wopi storage." allow="true">
+            <host desc="Regex pattern of hostname to allow or deny." allow="true">colabora\.rashed\.app</host>
+            <host desc="Regex pattern of hostname to allow or deny." allow="true">localhost</host>
+            <host desc="Regex pattern of hostname to allow or deny." allow="true">127\.0\.0\.1</host>
+            <max_file_size desc="Maximum document size in bytes to load. 0 for unlimited." type="uint" default="0">0</max_file_size>
+            <locking desc="Locking settings">
+                <refresh desc="How frequently we should re-acquire a lock with the storage server, in seconds (default 15 mins) or 0 for no refresh" type="int" default="900">900</refresh>
+            </locking>
+            <alias_groups desc="default mode is 'first' it allows only the first host when groups are not defined. set mode to 'groups' and define group to allow multiple host and its aliases" mode="first">
+            </alias_groups>
+        </wopi>
+        <webdav desc="Allow/deny webdav storage." allow="false">
+            <host desc="Hostname to allow" allow="false">localhost</host>
+        </webdav>
+    </storage>
+
+    <tile_cache_settings>
+        <tile_cache_path desc="Path to a directory where to keep the tile cache" type="path" relative="true" default="cache">/tmp/coolwsd_tilecache</tile_cache_path>
+    </tile_cache_settings>
+
+
+    <monitors desc="Addresses of servers we connect to on start for monitoring">
+    </monitors>
+
+    <quarantine_files desc="Files are stored here to be examined later in cases of crashes or similar situation." enable="false">
+        <path desc="Path to directory under which quarantined files will be stored" type="path" relative="true" default="quarantine"></path>
+        <max_size_mb desc="Maximum allowed quarantine size in MB" type="uint" default="250">250</max_size_mb>
+    </quarantine_files>
+
+    <remote_config>
+        <remote_url desc="remote server to which you will send resquest to get remote config in response." type="string" default=""></remote_url>
+    </remote_config>
+
+</config>
