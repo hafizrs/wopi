@@ -139,8 +139,8 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 UploadHeaders = JsonConvert.SerializeObject(command.UploadHeaders ?? new Dictionary<string, string>()),
                 FileName = command.FileName ?? _defaultFileName,
                 AccessToken = command.AccessToken ?? _defaultAccessToken,
-                UserId = command.UserId ?? "default-user",
-                UserDisplayName = command.UserDisplayName ?? null,
+                UserId = "anonymous",           // Hide real user identity
+                UserDisplayName = "User",       // Hide real user name
                 CanEdit = command.CanEdit || true, // Ensure CanEdit is true by default
                 CreatedAt = DateTime.UtcNow,
                 Downloaded = false,
@@ -202,37 +202,50 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 OwnerId = session.UserId,
                 UserId = session.UserId,
                 UserCanWrite = session.CanEdit, // CRITICAL: Must be true for editing
-                UserCanRename = false,
-                UserCanNotWriteRelative = true,
+                UserCanRename = false,          // Hide rename button
+                UserCanNotWriteRelative = true, // Prevent "Save As" functionality
                 Version = DateTime.UtcNow.Ticks.ToString(), // CRITICAL: Required for X-WOPI-ItemVersion header
-                UserFriendlyName = session.UserDisplayName,
+                UserFriendlyName = "User",      // Hide real user name
                 PostMessageOrigin = _collaboraBaseUrl,
-                // Additional permissions for editing
-                EnableOwnerTermination = false,
-                SupportsLocks = true,
-                SupportsGetLock = true,
-                SupportsExtendedLockLength = true,
-                SupportsCobalt = false,
-                SupportsUpdate = true,
-                UserCanPresent = false,
                 
-                // CRITICAL: Set all the missing properties that Collabora needs
-                SupportsPutFile = true,           // This is the key one!
-                SupportsUnlock = true,
-                SupportsRefreshLock = true,
-                SupportsGetFile = true,
-                SupportsCheckFileInfo = true,
-                SupportsDeleteFile = false,
-                SupportsRenameFile = false,
-                SupportsPutRelativeFile = true,
-                SupportsGetFileWopiSrc = false,
+                // HIDE UNNECESSARY FEATURES:
+                EnableOwnerTermination = false,
+                SupportsLocks = false,           // Hide lock operations
+                SupportsGetLock = false,         // Hide lock UI
+                SupportsExtendedLockLength = false,
+                SupportsCobalt = false,          // Hide advanced features
+                SupportsUpdate = true,           // Keep file update/save
+                UserCanPresent = false,         // Hide presentation mode
+                
+                // CRITICAL: Set properties to hide UI elements
+                SupportsPutFile = true,          // Keep file save functionality
+                SupportsUnlock = true,          // Hide unlock
+                SupportsRefreshLock = true,     // Hide lock refresh
+                SupportsGetFile = true,          // Keep file retrieval
+                SupportsCheckFileInfo = true,    // Keep file info
+                SupportsDeleteFile = false,      // Hide delete button
+                SupportsRenameFile = false,      // Hide rename button
+                SupportsPutRelativeFile = false, // Hide "File" tab and "Save As" button
+                SupportsGetFileWopiSrc = false,  // Hide blue diamond icon (file source)
                 SupportsExecuteCobaltRequest = false,
-                SupportsUserInfo = false,
-                SupportsFolders = false,
-                SupportsFileCreation = false,
+                SupportsUserInfo = false,        // Hide user info (prevents multi-user annotations)
+                SupportsFolders = false,         // Hide folder operations
+                SupportsFileCreation = false,    // Hide document icon (file creation)
                 
                 // Additional critical properties for Collabora
-                AllowWrite = session.CanEdit     // CRITICAL: Must match UserCanWrite
+                AllowWrite = session.CanEdit,    // CRITICAL: Must match UserCanWrite
+                
+                // CUSTOM UI HIDING PROPERTIES (adopted from your request):
+                HideFileMenu = true,             // Hide File menu completely
+                HideHelpMenu = true,             // Hide Help menu
+                HideToolsMenu = true,            // Hide Tools menu
+                HideViewMenu = false,            // Keep View menu (needed for editing)
+                HideUserList = true,             // Hide user list (prevents multi-user annotations)
+                DisableCopy = false,             // Keep copy functionality
+                DisablePrint = true,             // Hide print option
+                DisableExport = true,            // Hide export option
+                DisableSave = false,             // Keep save functionality
+                EnableShare = false,             // Hide share functionality
             };
         }
 

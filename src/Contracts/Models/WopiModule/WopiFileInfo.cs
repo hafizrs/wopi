@@ -39,5 +39,18 @@ namespace Selise.Ecap.SC.Wopi.Contracts.Models.WopiModule
         
         // Additional critical properties for Collabora
         public bool AllowWrite { get; set; }
+        
+        // Custom UI hiding properties (may be recognized by Collabora)
+        public bool HideFileMenu { get; set; }
+        public bool HideHelpMenu { get; set; }
+        public bool HideToolsMenu { get; set; }
+        public bool HideViewMenu { get; set; }
+        public bool HideUserList { get; set; }
+        public bool DisableCopy { get; set; }
+        public bool DisablePrint { get; set; }
+        public bool DisableExport { get; set; }
+        public bool DisableSave { get; set; }
+        public bool EnableShare { get; set; }
+        public bool EnableInsertRemoteImage { get; set; }
     }
 } 
