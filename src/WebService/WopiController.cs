@@ -79,7 +79,6 @@ namespace Selise.Ecap.SC.Wopi.WebService
             _logger.LogInformation("Base URL: {BaseUrl}", baseUrl);
             
             // Standard WOPI discovery format that Collabora expects
-            // Modified to hide unnecessary buttons and features
             var discovery = new
             {
                 net_zone = "external-http",
@@ -89,29 +88,26 @@ namespace Selise.Ecap.SC.Wopi.WebService
                     favIconUrl = $"{baseUrl}/favicon.ico",
                     checkLicense = false,
                     hasTheme = false,
-                    
-                    // HIDE QUICK ACCESS TOOLBAR ELEMENTS:
-                    supportsGetFileWopiSrc = false,    // Hide blue diamond icon (file source)
-                    supportsFileCreation = false,      // Hide document icon (file creation)
-                    supportsPutRelativeFile = false,   // Hide "File" tab functionality
-                    
-                    // HIDE OTHER UNNECESSARY FEATURES:
-                    supportsGetLock = false,           // Hide lock operations
-                    supportsLocks = false,             // Hide lock UI
-                    supportsExtendedLockLength = false,
-                    supportsRename = false,            // Hide rename button
-                    supportsDeleteFile = false,        // Hide delete button
-                    supportsUserInfo = false,          // Hide user info (prevents multi-user annotations)
-                    supportsFolders = false,           // Hide folder operations
-                    supportsUpdate = true,             // Keep file update/save
-                    supportsCobalt = false,            // Hide advanced features
-                    supportsPutFile = true,            // Keep file save
-                    supportsUnlock = true,            // Hide unlock
-                    supportsRefreshLock = true,       // Hide lock refresh
-                    supportsLock = false,              // Hide lock
-                    supportsGetFile = true,            // Keep file retrieval
-                    supportsCheckFileInfo = true,      // Keep file info
-                    supportsExecuteCobaltRequest = false,
+                    // CRITICAL: These must be exactly as Collabora expects
+                    supportsGetLock = true,
+                    supportsLocks = true,
+                    supportsExtendedLockLength = true,
+                    supportsFileCreation = false,
+                    supportsRename = false,
+                    supportsDeleteFile = false,
+                    supportsUserInfo = false,
+                    supportsFolders = false,
+                    supportsUpdate = true,
+                    supportsCobalt = false,
+                    supportsGetFileWopiSrc = false,
+                    supportsPutFile = true,
+                    supportsPutRelativeFile = true,
+                    supportsUnlock = true,
+                    supportsRefreshLock = true,
+                    supportsLock = true,
+                    supportsGetFile = true,
+                    supportsCheckFileInfo = true,
+                    supportsExecuteCobaltRequest = false
                 }
             };
 
