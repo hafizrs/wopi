@@ -1,4 +1,4 @@
-### 4.3 Verify Container Status# Collabora Online Docker Setup Guide
+# Collabora Online Docker Setup Guide
 
 Complete guide to set up Collabora Online using Docker with custom configuration files and branding.
 
