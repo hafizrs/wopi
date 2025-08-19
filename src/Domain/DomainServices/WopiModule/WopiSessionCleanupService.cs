@@ -122,8 +122,13 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 {
                     try
                     {
-                        // Delete the session
-                         WopiSessionStore.Delete(session.ItemId);
+                        if (session.CreatedAt.AddDays(1) > DateTime.UtcNow)
+                        {
+                            // Skip sessions created within the last 24 hours
+                            continue;
+                        }
+
+                        WopiSessionStore.Delete(session.ItemId);
                         
                         deletedFiles++;
                     }
