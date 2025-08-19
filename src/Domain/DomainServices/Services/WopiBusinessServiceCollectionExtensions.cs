@@ -11,6 +11,7 @@ public static class WopiBusinessServiceCollectionExtensions
     public static void AddWopiBusinessServices(this IServiceCollection services)
     {
         services.AddSingleton<IWopiService, WopiService>();
+        services.AddHostedService<WopiSessionCleanupService>();
     }
 
     public static void RegisterAllDerivedTypes<T>(
