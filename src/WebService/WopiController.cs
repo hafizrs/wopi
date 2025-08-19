@@ -145,11 +145,15 @@ namespace Selise.Ecap.SC.Wopi.WebService
             return _service.GetWopiSession(query);
         }
 
-        [HttpDelete("session")]
+        [HttpPost("session/delete")]
         [AllowAnonymous]
-        public async Task CleanupSessions([FromBody] string[] sessionIds)
+        public async Task CleanupSessions([FromBody] DeleteWopiSessionCommand command)
         {
-            var command = new DeleteWopiSessionCommand { SessionIds = sessionIds };
+            if (command == null)
+            {
+                _logger.LogWarning("DeleteWopiSessionCommand is null");
+                return;
+            }
             await _service.DeleteWopiSession(command);
         }
 
