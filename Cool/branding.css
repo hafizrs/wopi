@@ -879,6 +879,13 @@ or by setting a different prefix by passing it and 2nd argument
   }
 }
 
+.iframe-welcome-wrap {
+  display: none !important;
+}
+.iframe-welcome-content {
+  display: none !important;
+}
+
 .lo-menu > li > a, .lo-menu > li > a.has-submenu {
   border-radius: var(--co-border-radius);
   font-size: var(--default-font-size);
