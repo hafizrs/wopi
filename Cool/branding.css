@@ -844,6 +844,41 @@ or by setting a different prefix by passing it and 2nd argument
    }
 }
 
+#toolbar-wrapper.hasnotebookbar {
+  .unoFullScreen {
+    display: none !important;
+  }
+}
+
+#toolbar-wrapper {
+  .unospan-print {
+    display: none !important;
+  }
+  .unospan-save {
+    display: none !important;
+  }
+}
+
+#main-menu {
+  #menu-file {
+    display: none !important;
+  }
+  #menu-help {
+    display: none !important;
+  }
+  #menu-editmenu {
+    display: none !important;
+  }
+  #menu-last-mod {
+    display: none !important;
+  }
+  #menu-view {
+    #menu-fullscreen {
+      display: none !important;
+    }
+  }
+}
+
 .lo-menu > li > a, .lo-menu > li > a.has-submenu {
   border-radius: var(--co-border-radius);
   font-size: var(--default-font-size);

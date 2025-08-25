@@ -105,3 +105,19 @@ sudo nginx -t
 sudo systemctl reload nginx
 sudo systemctl status nginx
 ```
+
+
+for read-only mode
+# Pull the latest version
+sudo docker pull collabora/code:latest
+
+# Then run with the latest image
+sudo docker run -t -d -p 127.0.0.1:9980:9980 \
+  -e 'domain=colabora\.rashed\.app' \
+  --restart always \
+  --cap-add MKNOD \
+  --user cool \
+  -v /home/azureuser/collabora-config/coolwsd.xml:/etc/coolwsd/coolwsd.xml \
+  -v /home/azureuser/collabora-config/branding.css:/usr/share/coolwsd/browser/dist/branding.css \
+  --name collabora \
+  collabora/code:latest
