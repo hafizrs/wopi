@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Newtonsoft.Json;
-using System.Collections.Concurrent;
 using Selise.Ecap.SC.Wopi.Contracts.Commands.WopiModule;
 using Selise.Ecap.SC.Wopi.Contracts.Constants;
 using Selise.Ecap.SC.Wopi.Contracts.DomainServices.WopiModule;
@@ -11,11 +10,13 @@ using Selise.Ecap.SC.Wopi.Contracts.EntityResponse;
 using Selise.Ecap.SC.Wopi.Contracts.Models.WopiModule;
 using Selise.Ecap.SC.Wopi.Contracts.Queries.WopiModule;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -537,7 +538,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 
                 uploadHeaders ??= JsonConvert.DeserializeObject<Dictionary<string, string>>(session.UploadHeaders ?? "{}");
 
-                return await UploadFileToStorageByUrlAsync(session.UploadUrl, fileBuffer, uploadHeaders);
+                return await UploadFileToStorageByUrlAsync(session.UploadUrl, fileBuffer, uploadHeaders, session.WebHookUrl);
             }
             catch (Exception ex)
             {
@@ -599,6 +600,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 session.UploadUrl = command.UploadUrl;  // Always update with the new upload URL
                 session.UploadHeaders = JsonConvert.SerializeObject(command.UploadHeaders ?? new Dictionary<string, string>());
                 session.LastUpdateDate = DateTime.UtcNow.ToLocalTime();
+                session.WebHookUrl = command.WebHookUrl;
 
                 // Update both in-memory and disk storage
                 WopiSessionStore.Set(command.SessionId, session);
@@ -614,7 +616,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
 
                 _logger.LogInformation("File Bytes length: {len}", fileBytes?.Length ?? 0);
                 // Use the improved upload method
-                return await UploadFileToStorageByUrlAsync(command.UploadUrl, fileBytes, command.UploadHeaders, cancellationToken);
+                return await UploadFileToStorageByUrlAsync(command.UploadUrl, fileBytes, command.UploadHeaders, command.WebHookUrl, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -627,6 +629,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             string uploadUrl,
             byte[] bytes,
             Dictionary<string, string> customHeaders = null,
+            string webhookUrl = null,
             CancellationToken token = default)
         {
             using var client = new HttpClient();
@@ -659,9 +662,31 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             var code = response.EnsureSuccessStatusCode().StatusCode;
             _logger.LogInformation("Blob upload → {StatusCode}", (int)code);
 
-            return code is HttpStatusCode.OK or HttpStatusCode.Created;
+            var res = code is HttpStatusCode.OK or HttpStatusCode.Created;
+
+            if (res && !string.IsNullOrEmpty(webhookUrl))
+            {
+                await SendToWebHookUrl(webhookUrl);
+            }
+
+            return res;
         }
 
+        private async Task SendToWebHookUrl(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+                throw new ArgumentException("Webhook URL cannot be null or empty.", nameof(url));
 
+            try
+            {
+                HttpResponseMessage response = await _httpClient.PostAsync(url, null);
+                response.EnsureSuccessStatusCode(); // Throws exception if the status code is not 2xx
+                Console.WriteLine($"Webhook sent successfully. Status: {response.StatusCode}");
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Error in SendToWebHookUrl for url: {url}", url);
+            }
+        }
     }
 } 
