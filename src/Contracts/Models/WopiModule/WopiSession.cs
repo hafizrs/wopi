@@ -25,6 +25,7 @@ namespace Selise.Ecap.SC.Wopi.Contracts.Models.WopiModule
         public string WopiSrc { get; set; }
         public string FileId { get; set; }
         public string WebHookUrl { get; set; }
+        public string EntityId { get; set; }
 
         // Lock state management
         public bool IsLocked { get; set; }

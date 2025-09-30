@@ -538,7 +538,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 
                 uploadHeaders ??= JsonConvert.DeserializeObject<Dictionary<string, string>>(session.UploadHeaders ?? "{}");
 
-                return await UploadFileToStorageByUrlAsync(session.UploadUrl, fileBuffer, uploadHeaders, session.WebHookUrl);
+                return await UploadFileToStorageByUrlAsync(session.UploadUrl, fileBuffer, uploadHeaders, session.WebHookUrl, session.EntityId);
             }
             catch (Exception ex)
             {
@@ -601,6 +601,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 session.UploadHeaders = JsonConvert.SerializeObject(command.UploadHeaders ?? new Dictionary<string, string>());
                 session.LastUpdateDate = DateTime.UtcNow.ToLocalTime();
                 session.WebHookUrl = command.WebHookUrl;
+                session.EntityId = command.EntityId;
 
                 // Update both in-memory and disk storage
                 WopiSessionStore.Set(command.SessionId, session);
@@ -616,7 +617,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
 
                 _logger.LogInformation("File Bytes length: {len}", fileBytes?.Length ?? 0);
                 // Use the improved upload method
-                return await UploadFileToStorageByUrlAsync(command.UploadUrl, fileBytes, command.UploadHeaders, command.WebHookUrl, cancellationToken);
+                return await UploadFileToStorageByUrlAsync(session.UploadUrl, fileBytes, command.UploadHeaders, session.WebHookUrl, session.EntityId, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -630,6 +631,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             byte[] bytes,
             Dictionary<string, string> customHeaders = null,
             string webhookUrl = null,
+            string entityId = null,
             CancellationToken token = default)
         {
             using var client = new HttpClient();
@@ -666,20 +668,22 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
 
             if (res && !string.IsNullOrEmpty(webhookUrl))
             {
-                await SendToWebHookUrl(webhookUrl);
+                await SendToWebHookUrl(webhookUrl, entityId);
             }
 
             return res;
         }
 
-        private async Task SendToWebHookUrl(string url)
+        private async Task SendToWebHookUrl(string url, string entityId)
         {
             if (string.IsNullOrWhiteSpace(url))
                 throw new ArgumentException("Webhook URL cannot be null or empty.", nameof(url));
 
+            var content = new StringContent(entityId, Encoding.UTF8, "application/json");
+
             try
             {
-                HttpResponseMessage response = await _httpClient.PostAsync(url, null);
+                HttpResponseMessage response = await _httpClient.PostAsync(url, content);
                 response.EnsureSuccessStatusCode(); // Throws exception if the status code is not 2xx
                 Console.WriteLine($"Webhook sent successfully. Status: {response.StatusCode}");
             }

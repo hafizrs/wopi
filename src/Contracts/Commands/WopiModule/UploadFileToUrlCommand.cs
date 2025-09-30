@@ -8,5 +8,6 @@ namespace Selise.Ecap.SC.Wopi.Contracts.Commands.WopiModule
         public Dictionary<string, string> UploadHeaders { get; set; }
         public string SessionId { get; set; }
         public string WebHookUrl { get; set; }
+        public string EntityId { get; set; }
     }
 } 
