@@ -44,7 +44,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             _httpClient = httpClient;
             _logger = logger;
             _localFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, configuration["LocalFilePath"] ?? "temp_files");
-            _collaboraBaseUrl = configuration["CollaboraBaseUrl"] ?? "https://colabora.rashed.app";
+            _collaboraBaseUrl = configuration["CollaboraBaseUrl"];
             _defaultFileName = configuration["DefaultFileName"] ?? "Document.docx";
             _defaultAccessToken = configuration["DefaultAccessToken"] ?? "default-token-123";
             _defaultUserDisplayName = configuration["DefaultUserDisplayName"] ?? "Anonymous User";
