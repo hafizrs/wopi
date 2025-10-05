@@ -28,6 +28,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
         private readonly HttpClient _httpClient;
         private readonly string _localFilePath;
         private readonly string _collaboraBaseUrl;
+        private readonly string _collaboraSrcUrl;
         private readonly string _defaultFileName;
         private readonly string _defaultAccessToken;
         private readonly string _defaultUserDisplayName;
@@ -45,6 +46,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             _logger = logger;
             _localFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, configuration["LocalFilePath"] ?? "temp_files");
             _collaboraBaseUrl = configuration["CollaboraBaseUrl"];
+            _collaboraSrcUrl = configuration["CollaboraSrcUrl"];
             _defaultFileName = configuration["DefaultFileName"] ?? "Document.docx";
             _defaultAccessToken = configuration["DefaultAccessToken"] ?? "default-token-123";
             _defaultUserDisplayName = configuration["DefaultUserDisplayName"] ?? "Anonymous User";
@@ -123,7 +125,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             }
 
             // Generate edit URL (matching JavaScript implementation exactly)
-            var wopiSrc = Uri.EscapeDataString($"{_collaboraBaseUrl}/wopi/files/{sessionId}");
+            var wopiSrc = Uri.EscapeDataString($"{_collaboraSrcUrl}/wopi/files/{sessionId}");
             var editUrl = $"{_collaboraBaseUrl}/browser/{_browserPath}/cool.html?WOPISrc={wopiSrc}&access_token={command.AccessToken ?? _defaultAccessToken}";
 
             var session = new WopiSession
