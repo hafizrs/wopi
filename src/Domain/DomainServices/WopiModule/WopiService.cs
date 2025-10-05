@@ -152,7 +152,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
                 
                 // Store computed properties
                 EditUrl = editUrl,
-                WopiSrc = $"{_collaboraBaseUrl}/wopi/files/{sessionId}"
+                WopiSrc = $"{_collaboraSrcUrl}/wopi/files/{sessionId}"
             };
 
             // Store session in memory (like JavaScript Map)
