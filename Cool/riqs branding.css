@@ -1,4 +1,4 @@
-/* (C) Collabora Productivity 2025, All Rights Reserved, (version 25.04.4-2) */
+/* (C) Collabora Productivity 2025, All Rights Reserved, (version 25.04.5-4) */
 
 /*modify css start*/
 
@@ -101,7 +101,6 @@
     bottom: -48px;
   }
 }
-
 .leaflet-progress-spinner::before {
   content: "";
   position: relative;
@@ -222,36 +221,9 @@ html:not([data-theme=dark]) #save.notebookbar.saving img {
   filter: none !important;
 }
 
-[data-doctype=text][data-userinterfacemode=notebookbar] .notebookbar-options-section .notebookbar.shareas:not(.unospan-ShareAs) .unobutton img {
-  background: url("images/lc_sidebar_menu-share-writer.svg") no-repeat center/24px;
-  width: 24px !important;
-  height: 24px !important;
-  padding-left: calc( var(--btn-img-size) * 2 ) !important;
-  opacity: 1;
-}
-
-[data-doctype=spreadsheet][data-userinterfacemode=notebookbar] .notebookbar-options-section .notebookbar.shareas:not(.unospan-ShareAs) .unobutton img {
-  background: url("images/lc_sidebar_menu-share-calc.svg") no-repeat center/24px;
-  width: 24px !important;
-  height: 24px !important;
-  padding-left: calc( var(--btn-img-size) * 2 ) !important;
-  opacity: 1;
-}
-
-[data-doctype=presentation][data-userinterfacemode=notebookbar] .notebookbar-options-section .notebookbar.shareas:not(.unospan-ShareAs) .unobutton img {
-  background: url("images/lc_sidebar_menu-share-impress.svg") no-repeat center/24px;
-  width: 24px !important;
-  height: 24px !important;
-  padding-left: calc( var(--btn-img-size) * 2 ) !important;
-  opacity: 1;
-}
-
-[data-doctype=drawing][data-userinterfacemode=notebookbar] .notebookbar-options-section .notebookbar.shareas:not(.unospan-ShareAs) .unobutton img {
-  background: url("images/lc_sidebar_menu-share-draw.svg") no-repeat center/24px;
-  width: 24px !important;
-  height: 24px !important;
-  padding-left: calc( var(--btn-img-size) * 2 ) !important;
-  opacity: 1;
+#closebuttonwrapperseparator {
+  visibility: hidden !important;
+  width: 0 !important;
 }
 
 html:not([data-theme=dark]) .unoSetBorderStyle .unobutton img, html:not([data-theme=dark]) #setborderstyle img {
@@ -501,35 +473,35 @@ html:not([data-theme=dark]) .jsdialog input[type=checkbox]:disabled {
   background-image: url("images/checkbox-off-disabled.svg") !important;
 }
 
-html:not([data-theme=dark]) .jsdialog input[type=radio]:checked {
+html:not([data-theme=dark]) .jsdialog input[type=radio]:checked:not(.ui-color-picker-entry) {
   background-image: url("images/radio-on.svg") !important;
 }
 
-html:not([data-theme=dark]) .jsdialog input[type=radio] {
+html:not([data-theme=dark]) .jsdialog input[type=radio]:not(.ui-color-picker-entry) {
   background: url("images/radio-off.svg") no-repeat center !important;
 }
 
-html:not([data-theme=dark]) .jsdialog input[type=radio]:checked:disabled {
+html:not([data-theme=dark]) .jsdialog input[type=radio]:checked:disabled:not(.ui-color-picker-entry) {
   background-image: url("images/radio-on-disabled.svg") !important;
 }
 
-html:not([data-theme=dark]) .jsdialog input[type=radio]:disabled {
+html:not([data-theme=dark]) .jsdialog input[type=radio]:disabled:not(.ui-color-picker-entry) {
   background-image: url("images/radio-off-disabled.svg") !important;
 }
 
-html[data-theme=dark] .jsdialog input[type=radio]:checked {
+html[data-theme=dark] .jsdialog input[type=radio]:checked:not(.ui-color-picker-entry) {
   background-image: url("images/radio-on-dark.svg") !important;
 }
 
-html[data-theme=dark] .jsdialog input[type=radio] {
+html[data-theme=dark] .jsdialog input[type=radio]:not(.ui-color-picker-entry) {
   background: url("images/radio-off-dark.svg") no-repeat center !important;
 }
 
-html[data-theme=dark] .jsdialog input[type=radio]:checked:disabled {
+html[data-theme=dark] .jsdialog input[type=radio]:checked:disabled:not(.ui-color-picker-entry) {
   background-image: url("images/radio-on-disabled-dark.svg") !important;
 }
 
-html[data-theme=dark] .jsdialog input[type=radio]:disabled {
+html[data-theme=dark] .jsdialog input[type=radio]:disabled:not(.ui-color-picker-entry) {
   background-image: url("images/radio-off-disabled-dark.svg") !important;
 }
 
@@ -910,6 +882,14 @@ or by setting a different prefix by passing it and 2nd argument
   margin-left: 0px;
 }
 
+#document-header {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  width: 38px;
+  height: 32px;
+}
+
 .lo-menu > li > a, .lo-menu > li > a.has-submenu {
   border-radius: var(--co-border-radius);
   font-size: var(--default-font-size);
@@ -1130,9 +1110,6 @@ html:not([data-theme=dark]) .hasnotebookbar .ui-content.unotoolbutton.selected:n
 html:not([data-theme=dark]) .sidebar.unotoolbutton.selected,
 html:not([data-theme=dark]) .notebookbar.unotoolbutton.selected {
   border-radius: var(--co-border-radius) !important;
-  outline-color: transparent;
-  border-color: #C5C5C5 !important;
-  background-color: var(--color-border-dark) !important;
 }
 
 html[data-theme=dark] .hasnotebookbar .ui-content.unotoolbutton.selected:not(.has-label):not(.inline):not([class*=unospan-options-]),
@@ -1149,12 +1126,14 @@ html[data-theme=dark] .sidebar.unotoolbutton.selected {
   filter: none !important;
 }
 
-.hasnotebookbar .ui-content.unotoolbutton.selected:hover,
-.unotoolbutton.notebookbar:hover,
-.hasnotebookbar .ui-content.unotoolbutton.selected:not(.has-label):not(.inline):hover,
+.ui-content.unotoolbutton.selected:hover,
+.unotoolbutton:hover,
+.ui-content.unotoolbutton.selected:not(.has-label):not(.inline):hover,
 #clearFormatting:hover,
 #FormatPaintbrush:hover {
   border-radius: var(--co-border-radius) !important;
+  background-color: var(--color-background-dark) !important;
+  border-color: transparent !important;
 }
 
 #toolbar-down .unotoolbutton.jsdialog:hover {
@@ -1221,8 +1200,6 @@ html[data-theme=dark] .sidebar.unotoolbutton.selected {
 .main-nav.hasnotebookbar .ui-tab.selected.notebookbar,
 .main-nav.hasnotebookbar .ui-tab.selected.notebookbar:hover {
   box-shadow: none !important;
-  border-top-left-radius: var(--border-radius);
-  border-top-right-radius: var(--border-radius);
   background-color: var(--co-color-background-light) !important;
 }
 .main-nav.hasnotebookbar .ui-tab.selected.notebookbar:hover {
@@ -1237,14 +1214,15 @@ html[data-theme=dark] .sidebar.unotoolbutton.selected {
   background-color: var(--color-background-darker);
 }
 
+html:not([data-theme=dark]) #optionstoolboxdown .notebookbar.unotoolbutton:not(.shareas):hover {
+  border-color: transparent !important;
+}
 html:not([data-theme=dark]) #optionstoolboxdown .notebookbar.unotoolbutton.selected {
   background-color: transparent !important;
   border-color: transparent !important;
 }
-html:not([data-theme=dark]) #optionstoolboxdown .notebookbar.unotoolbutton.selected button {
-  background-color: var(--co-color-bg-nb-tab);
-  border-radius: var(--border-radius);
-  box-shadow: inset 0 0 1px white;
+html:not([data-theme=dark]) #optionstoolboxdown .notebookbar.unotoolbutton.selected button img {
+  box-shadow: inset 0 -1px 0 0 var(--co-color-bg-nb-tab) !important;
 }
 html:not([data-theme=dark]) .main-nav {
   background-color: rgb(var(--doc-type, var(--co-primary-elment-rgb))) !important;
@@ -1275,6 +1253,23 @@ html:not([data-theme=dark]) .ui-tab.selected.notebookbar:hover {
 
 #slide-sorter {
   scrollbar-color: var(--color-background-darker) var(--co-color-background-light);
+}
+
+.main-nav.hasnotebookbar .shareas {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+  border-color: #fff !important;
+}
+.main-nav.hasnotebookbar .shareas .unobutton {
+  display: none;
+}
+.main-nav.hasnotebookbar .shareas .unolabel {
+  font-size: 0.88rem;
+  line-height: 1.125rem;
+  color: #fff !important;
+}
+
+html:not([data-theme=dark]) .main-nav.hasnotebookbar .shareas .unolabel {
+  border-color: #fff !important;
 }
 
 #toolbar-top #sidebar {
@@ -1540,8 +1535,7 @@ input[type=checkbox]:checked.autofilter:hover, .jsdialog input[type=checkbox]:ch
   box-shadow: 0px 0px 1px 2px var(--color-box-shadow);
 }
 
-
-.jsdialog input[type=radio] {
+.jsdialog input[type=radio]:not(.ui-color-picker-entry) {
   /*to be removed upon upstream merge */
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -1586,8 +1580,8 @@ input[type=checkbox]:checked.autofilter:hover, .jsdialog input[type=checkbox]:ch
   background: var(--color-main-background);
   color: var(--color-main-text);
   border: none;
-  text-transform: uppercase;
   font-family: sans-serif;
+  font-weight: normal;
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
 }
@@ -1722,6 +1716,6 @@ html:not([data-theme=dark]) body #settingIframe {
 }
 
 .jsdialog input[type=checkbox]:focus-visible {
-  outline: 1px solid var(--co-primary-element);
-  outline-offset: -3px;
+  outline: 1px solid #005ebd;
+  outline-offset: -1px;
 }
