@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name collabora.selise.biz;
+    server_name colabora.rashed.app;
 
     # Allow WOPI endpoints via HTTP (for Collabora container access)
     location /wopi/ {
@@ -20,12 +20,12 @@ proxy_pass http://localhost:3000;
 
 # HTTPS server
 server {
-    #listen 443 ssl;
-    #server_name collabora.selise.biz;
+    listen 443 ssl;
+    server_name colabora.rashed.app;
 
     # Your SSL certificates
-    #ssl_certificate /etc/letsencrypt/live/collabora.selise.biz/fullchain.pem;
-    #ssl_certificate_key /etc/letsencrypt/live/collabora.selise.biz/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/colabora.rashed.app/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/colabora.rashed.app/privkey.pem;
 
     # WOPI endpoints
     location /wopi/ {
