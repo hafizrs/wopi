@@ -1,5 +1,78 @@
 /* (C) Collabora Productivity 2025, All Rights Reserved, (version 25.04.4-2) */
 
+/*modify css start*/
+
+:root {
+    --custom-doc-type: 20, 94, 74; /* overrides */
+}
+[data-doctype='text'] {
+    --doc-type: var(--custom-doc-type);
+}
+
+#document-header {
+  display: none !important;
+}
+
+.notebookbar-shortcuts-bar {
+   display: none !important;
+}
+
+.notebookbar-tabs-container {
+   #File-tab-label {
+      display: none !important;
+   }
+   #Help-tab-label {
+      display: none !important;
+   }
+}
+
+#toolbar-wrapper.hasnotebookbar {
+  .unoFullScreen {
+    display: none !important;
+  }
+}
+
+#toolbar-wrapper {
+  .unospan-print {
+    display: none !important;
+  }
+  .unospan-save {
+    display: none !important;
+  }
+}
+
+#main-menu {
+  #menu-file {
+    display: none !important;
+  }
+  #menu-help {
+    display: none !important;
+  }
+  #menu-editmenu {
+    display: none !important;
+  }
+  #menu-last-mod {
+    display: none !important;
+  }
+  #menu-view {
+    #menu-fullscreen {
+      display: none !important;
+    }
+	#menu-togglemenubar {
+		display: none !important;
+	}
+  }
+}
+
+.iframe-welcome-wrap {
+  display: none !important;
+}
+.iframe-welcome-content {
+  display: none !important;
+}
+
+/*modify css end*/
+
 @keyframes MoveUpDown {
   0%, 100% {
     bottom: -38px;
@@ -8,12 +81,7 @@
     bottom: -48px;
   }
 }
-:root {
-    --doc-type: 20, 94, 74; /* overrides */
-}
-[data-doctype='text'] {
-    --doc-type: 20, 94, 74;
-}
+
 .leaflet-progress-spinner::before {
   content: "";
   position: relative;
@@ -820,70 +888,6 @@ or by setting a different prefix by passing it and 2nd argument
 
 #main-menu {
   margin-left: 0px;
-}
-
-#document-header {
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  width: 38px;
-  height: 32px;
-  display: none !important;
-}
-
-.notebookbar-shortcuts-bar {
-   display: none !important;
-}
-
-.notebookbar-tabs-container {
-   #File-tab-label {
-      display: none !important;
-   }
-   #Help-tab-label {
-      display: none !important;
-   }
-}
-
-#toolbar-wrapper.hasnotebookbar {
-  .unoFullScreen {
-    display: none !important;
-  }
-}
-
-#toolbar-wrapper {
-  .unospan-print {
-    display: none !important;
-  }
-  .unospan-save {
-    display: none !important;
-  }
-}
-
-#main-menu {
-  #menu-file {
-    display: none !important;
-  }
-  #menu-help {
-    display: none !important;
-  }
-  #menu-editmenu {
-    display: none !important;
-  }
-  #menu-last-mod {
-    display: none !important;
-  }
-  #menu-view {
-    #menu-fullscreen {
-      display: none !important;
-    }
-  }
-}
-
-.iframe-welcome-wrap {
-  display: none !important;
-}
-.iframe-welcome-content {
-  display: none !important;
 }
 
 .lo-menu > li > a, .lo-menu > li > a.has-submenu {

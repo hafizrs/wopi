@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name colabora.rashed.app;
+    server_name collabora.selise.biz;
 
     # Allow WOPI endpoints via HTTP (for Collabora container access)
     location /wopi/ {
@@ -20,12 +20,12 @@ proxy_pass http://localhost:3000;
 
 # HTTPS server
 server {
-    listen 443 ssl;
-    server_name colabora.rashed.app;
+    #listen 443 ssl;
+    #server_name collabora.selise.biz;
 
     # Your SSL certificates
-    ssl_certificate /etc/letsencrypt/live/colabora.rashed.app/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/colabora.rashed.app/privkey.pem;
+    #ssl_certificate /etc/letsencrypt/live/collabora.selise.biz/fullchain.pem;
+    #ssl_certificate_key /etc/letsencrypt/live/collabora.selise.biz/privkey.pem;
 
     # WOPI endpoints
     location /wopi/ {
@@ -66,3 +66,52 @@ server {
         proxy_send_timeout 3600s;
     }
 }
+
+
+/* riqs
+server {
+    listen 80;
+    server_name collabora.selise.biz;
+
+    # WOPI backend (.NET app)
+    location /wopi/ {
+#        rewrite ^/wopi/(.*)$ /$1 break;
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Collabora admin / browser
+    location /browser/ {
+        proxy_pass http://localhost:9980;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        # Allow embedding
+        proxy_hide_header Content-Security-Policy;
+        proxy_hide_header X-Frame-Options;
+        add_header X-Frame-Options "ALLOWALL";
+    }
+
+    # Collabora WOPI iframe access
+    location / {
+        proxy_pass http://localhost:9980;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+    }
+}
+/*
+
+
