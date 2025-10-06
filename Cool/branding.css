@@ -49,7 +49,10 @@
     display: none !important;
   }
   #menu-editmenu {
-    display: none !important;
+    /*display: none !important;*/
+	#menu-changesmenu {
+		display: none !important;
+	}
   }
   #menu-last-mod {
     display: none !important;
@@ -62,6 +65,15 @@
 		display: none !important;
 	}
   }
+  #menu-form {
+	  ul li a.disabled {
+	  /*display: none !important;*/
+	}
+  }
+}
+
+#form-content-control-properties {
+	/*display: none !important;*/
 }
 
 .iframe-welcome-wrap {
