@@ -46,7 +46,10 @@
 
 #main-menu {
   #menu-file {
-    display: none !important;
+    /* display: none !important; */
+	#menu-save, #menu-downloadas, #menu-properties, #menu-signature {
+	   display: none !important;
+	}
   }
   #menu-help {
     display: none !important;
@@ -61,7 +64,7 @@
     display: none !important;
   }
   #menu-view {
-    #menu-fullscreen {
+    #menu-fullscreen, #menu-toggleuimode {
       display: none !important;
     }
     #menu-togglemenubar {
@@ -74,11 +77,16 @@
 	  display: none !important;
 	}
   }
+  #menu-insert > ul > li:nth-last-child(-n+2),
+  #menu-insert > ul > li:nth-child(10) {
+	display: none;
+  }
   #menu-insert {
     #menu-insertcomment {
 	  display: none !important;
     }
   }
+
   #menu-form {
 	display: none !important;
   }
