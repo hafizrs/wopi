@@ -19,7 +19,7 @@
 
 .notebookbar-tabs-container {
    #File-tab-label {
-      display: none !important;
+      /* display: none !important; */
    }
    #Help-tab-label {
       display: none !important;
@@ -36,11 +36,13 @@
 }
 
 #toolbar-wrapper {
-  .unospan-print {
+  .unospan-save, .unospan-file-save, .unospan-downloadas, .unospan-repair, .unospan-properties, .unospan-signature {
     display: none !important;
   }
-  .unospan-save {
-    display: none !important;
+  #insert-insert-annotation, #insert-insertannotation-break, #insert-FormattingMarkMenu, #insert-formattingmarkmenu-break,
+  #insert-symbols, #insert-insert-field-control, #review-comments, #review-deletecomment-break,
+  #review-accessibility-check, #format-edit-region, #format-format-line, #format-formatarea-break, #format-transform-dialog, #format-transformdialog-break {
+	  display: none !important;
   }
 }
 
@@ -64,8 +66,11 @@
     display: none !important;
   }
   #menu-view {
-    #menu-fullscreen, #menu-toggleuimode {
+    #menu-fullscreen {
       display: none !important;
+    }
+	#menu-toggleuimode {
+      /* display: none !important; */
     }
     #menu-togglemenubar {
       display: none !important;
@@ -77,10 +82,13 @@
 	  display: none !important;
 	}
   }
+  
   #menu-insert > ul > li:nth-last-child(-n+2),
-  #menu-insert > ul > li:nth-child(10) {
+  #menu-insert > ul > li:nth-child(10),
+  #menu-tools > ul > li:nth-child(8) {
 	display: none;
   }
+  
   #menu-insert {
     #menu-insertcomment {
 	  display: none !important;
@@ -88,6 +96,10 @@
   }
 
   #menu-form {
+	display: none !important;
+  }
+  
+  #menu-format > ul > li > a.disabled {
 	display: none !important;
   }
 }

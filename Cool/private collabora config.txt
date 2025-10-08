@@ -231,7 +231,7 @@
                 <enable default="false" desc="Controls whether the welcome screen should be shown to the users on new install and updates. When enabled, your custom welcome screen must be created at /usr/share/coolwsd/browser/dist/welcome/welcome.html." type="bool">false</enable>
         </welcome>
         <user_interface>
-                <mode default="default" desc="Controls the user interface style. The 'default' means: Take the value from ui_defaults, or decide for one of compact or tabbed (default|compact|tabbed)" type="string">default</mode>
+                <mode default="default" desc="Controls the user interface style. The 'default' means: Take the value from ui_defaults, or decide for one of compact or tabbed (default|compact|tabbed)" type="string">compact</mode>
                 <use_integration_theme default="true" desc="Use theme from the integrator" type="bool">true</use_integration_theme>
                 <statusbar_save_indicator default="true" desc="Show saving status indicator in the statusbar" type="bool">true</statusbar_save_indicator>
                 <brandProductName desc="Change the displayed name the application will have for the user." type="string"/>
