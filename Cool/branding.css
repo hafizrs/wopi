@@ -1,5 +1,4 @@
-/* (C) Collabora Productivity 2025, All Rights Reserved, (version 25.04.4-2) */
-
+/* (C) Collabora Productivity 2025, All Rights Reserved */
 
 /*modify css start*/
 
@@ -41,8 +40,10 @@
     display: none !important;
   }
   #insert-insert-annotation, #insert-insertannotation-break, #insert-FormattingMarkMenu, #insert-formattingmarkmenu-break,
-  #insert-symbols, #insert-insert-field-control, #review-comments, #review-deletecomment-break,
-  #review-accessibility-check, #format-edit-region, #format-format-line, #format-formatarea-break, #format-transform-dialog, #format-transformdialog-break {
+  #insert-symbols, #insert-insert-field-control, #review-comments, #review-deletecomment-break, #insert-frame, #references-insert-indexes-entry,
+  #references-update-current-index, #references-insert-bookmark, #references-insert-reference-field, #references-insertreferencefield-break, 
+  #review-thesaurus-dialog, #LanguageMenu, #review-spell-online, #format-paragraph-dialog, #format-font-dialog, #review-accessibility-check, 
+  #format-edit-region, #format-format-line, #format-formatarea-break, #format-transform-dialog, #format-transformdialog-break {
 	  display: none !important;
   }
 }
@@ -86,6 +87,18 @@
   
   #menu-insert > ul > li:nth-last-child(-n+2),
   #menu-insert > ul > li:nth-child(10),
+  #menu-insert > ul > li:nth-child(5),
+  #menu-format > ul > li:nth-child(10),
+  #menu-format > ul > li:nth-child(11),
+  #menu-references > ul > li:nth-child(2),
+  #menu-references > ul > li:nth-child(3),
+  #menu-references > ul > li:nth-child(9),
+  #menu-references > ul > li:nth-child(10),
+  #menu-tools > ul > li:nth-child(1),
+  #menu-tools > ul > li:nth-child(2),
+  #menu-tools > ul > li:nth-child(3),
+  #menu-tools > ul > li:nth-child(4),
+  #menu-tools > ul > li:nth-child(5),
   #menu-tools > ul > li:nth-child(8) {
 	display: none;
   }
