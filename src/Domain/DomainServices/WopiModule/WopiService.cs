@@ -681,7 +681,7 @@ namespace Selise.Ecap.SC.Wopi.Domain.DomainServices.WopiModule
             if (string.IsNullOrWhiteSpace(url))
                 throw new ArgumentException("Webhook URL cannot be null or empty.", nameof(url));
 
-            var content = !string.IsNullOrEmpty(entityId) ? new StringContent(entityId, Encoding.UTF8, "text/plain") : null;
+            var content = !string.IsNullOrEmpty(entityId) ? new StringContent(entityId, Encoding.UTF8, "application/json") : null;
 
             try
             {
