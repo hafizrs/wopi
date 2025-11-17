@@ -118,6 +118,14 @@
   }
 }
 
+#comment-arrow-container {
+  display: none !important;
+}
+
+.cool-annotation {
+  display: none !important;
+}
+
 .iframe-welcome-wrap {
   display: none !important;
 }
