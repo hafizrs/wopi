@@ -36,7 +36,7 @@
 }
 
 #toolbar-wrapper {
-  .unospan-save, .unospan-file-save, .unospan-downloadas, .unospan-repair, .unospan-properties, .unospan-signature {
+  .unospan-save, .unospan-file-save, .unospan-downloadas, .unospan-repair, .unospan-properties, .unospan-signature, unospan-closemobile {
     display: none !important;
   }
   #insert-insert-annotation, #insert-insertannotation-break, #insert-FormattingMarkMenu, #insert-formattingmarkmenu-break,
