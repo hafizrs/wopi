@@ -72,7 +72,7 @@ server {
 server {
     listen 80;
     server_name collabora.selise.biz;
-	client_max_body_size 50M; 
+	client_max_body_size 500M; 
     # WOPI backend (.NET app)
     location /wopi/ {
 #        rewrite ^/wopi/(.*)$ /$1 break;
