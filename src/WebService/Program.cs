@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,6 +55,11 @@ namespace Selise.Ecap.SC.Wopi.WebService
                           .WithHeaders("Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization",
                                "X-WOPI-Override", "X-WOPI-Lock", "X-WOPI-ItemVersion", "X-WOPI-LockExpires", "X-WOPI-ServerError", "X-WOPI-ServerVersion");
                 });
+            });
+
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.Limits.MaxRequestBodySize = 524288000; // 500 MB
             });
 
             builder.Services.AddControllers().AddJsonOptions(options =>
